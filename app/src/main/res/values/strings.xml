@@ -52,6 +52,15 @@
     <string name="remove_from_saved">Remove from saved</string>
     <string name="no_saved_messages">No saved messages</string>
 
+    <string name="receive">Receive</string>
+    <string name="receiver_title">Morse receiver</string>
+    <string name="close">Close</string>
+    <string name="clear">Clear</string>
+    <string name="point_camera">Point the camera at the flashing light</string>
+    <string name="waiting_for_signal">Waiting for signal\u2026</string>
+    <string name="camera_permission_needed">Camera permission is required to receive morse code.</string>
+    <string name="grant_permission">Grant permission</string>
+
     <string name="value_wpm" translatable="false">%1$d WPM</string>
     <string name="value_hz" translatable="false">%1$d Hz</string>
     <string name="value_seconds" translatable="false">%1$.2f s</string>

@@ -24,6 +24,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ fun ContentScreen(
     player: TransmissionPlayer,
     onUpdateSettings: ((TransmissionSettings) -> TransmissionSettings) -> Unit,
     onLibraryChange: (MessageLibrary) -> Unit,
+    onOpenReceiver: () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -59,6 +61,7 @@ fun ContentScreen(
                 settings = settings,
                 progressText = player.progressText,
                 onSend = { player.start(settings) },
+                onOpenReceiver = onOpenReceiver,
             )
             HorizontalDivider()
             Controls(
@@ -92,6 +95,7 @@ private fun Header(
     settings: TransmissionSettings,
     progressText: String,
     onSend: () -> Unit,
+    onOpenReceiver: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -118,6 +122,9 @@ private fun Header(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+        TextButton(onClick = onOpenReceiver) {
+            Text(stringResource(R.string.receive))
         }
         Button(
             onClick = onSend,

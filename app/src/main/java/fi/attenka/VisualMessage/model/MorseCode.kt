@@ -20,4 +20,7 @@ object MorseCode {
         put('Ü', "..--")
         put('Ñ', "--.--")
     }
+
+    /** Code -> character, for decoding a received signal back into text. */
+    val reverseInternational: Map<String, Char> = international.entries.associate { (k, v) -> v to k }
 }
