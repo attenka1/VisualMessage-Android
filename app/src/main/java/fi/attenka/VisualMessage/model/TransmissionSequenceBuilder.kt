@@ -97,14 +97,12 @@ object TransmissionSequenceBuilder {
                 }
 
                 if (letterIndex < letters.size - 1) {
-                    // One unit longer than the morse standard (3) to make gaps easier to read.
-                    frames += TransmissionFrame(FrameKind.Blank, unit * 4)
+                    frames += TransmissionFrame(FrameKind.Blank, unit * 3)
                 }
             }
 
             if (wordIndex < words.size - 1) {
-                // One unit longer than the morse standard (7) to make word breaks clearer.
-                frames += TransmissionFrame(FrameKind.Blank, unit * 8)
+                frames += TransmissionFrame(FrameKind.Blank, unit * 7)
             }
         }
 
