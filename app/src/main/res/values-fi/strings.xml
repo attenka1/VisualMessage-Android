@@ -19,6 +19,7 @@
     <string name="ready">Valmis</string>
     <string name="remove_from_saved">Poista tallennetuista</string>
     <string name="repeats">Toistot</string>
+    <string name="start_delay">Lähtöviive</string>
     <string name="save_message">Tallenna viesti</string>
     <string name="saved_messages">Tallennetut viestit</string>
     <string name="send">Lähetä</string>
@@ -37,4 +38,6 @@
     <string name="transition">Siirtymä</string>
     <string name="transition_fade">Häivytys</string>
     <string name="transition_instant">Suora</string>
+    <string name="high_frame_rate">Korkea kuvanopeus</string>
+    <string name="manual_exposure_hint">Kiinteä valotus lyhyen alustuksen jälkeen (ei automaattia)</string>
 </resources>

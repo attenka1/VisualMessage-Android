@@ -8,8 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
+import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
@@ -23,13 +23,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,12 +50,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fi.attenka.VisualMessage.R
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -81,11 +88,18 @@ fun ReceiveScreen(onClose: () -> Unit) {
             PermissionPrompt(onGrant = { permissionLauncher.launch(Manifest.permission.CAMERA) })
         }
 
-        TopBar(onClose = onClose, onClear = viewModel::clear)
+        Column(modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth()) {
+            TopBar(onClose = onClose, onClear = viewModel::clear)
+            CameraOptionsBar(
+                preferHighFrameRate = viewModel.preferHighFrameRate,
+                onPreferHighFrameRateChange = viewModel::updatePreferHighFrameRate,
+            )
+        }
         DecodedPanel(state = viewModel.state, modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
+@OptIn(ExperimentalCamera2Interop::class)
 @Composable
 private fun CameraLayer(viewModel: ReceiveViewModel) {
     val context = LocalContext.current
@@ -94,24 +108,32 @@ private fun CameraLayer(viewModel: ReceiveViewModel) {
     }
     var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.preferHighFrameRate) {
         val provider = withContext(Dispatchers.IO) {
             ProcessCameraProvider.getInstance(context).get()
         }
         cameraProvider = provider
 
-        val preview = Preview.Builder().build().apply {
+        val fpsRange = MorseCameraConfigurator.selectFpsRange(context, viewModel.preferHighFrameRate)
+        val preview = MorseCameraConfigurator.buildPreview(fpsRange).apply {
             setSurfaceProvider(previewView.surfaceProvider)
         }
-        val analysis = ImageAnalysis.Builder()
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .build()
-            .apply { setAnalyzer(ContextCompat.getMainExecutor(context), viewModel.analyzer) }
+        val analysis = MorseCameraConfigurator.buildAnalysis(fpsRange).apply {
+            setAnalyzer(ContextCompat.getMainExecutor(context), viewModel.analyzer)
+        }
 
         val owner = context.findLifecycleOwner()
         if (owner != null) {
             provider.unbindAll()
-            provider.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
+            val camera = provider.bindToLifecycle(
+                owner,
+                CameraSelector.DEFAULT_BACK_CAMERA,
+                preview,
+                analysis,
+            )
+            launch {
+                runCatching { MorseCameraConfigurator.applyManualExposure(camera) }
+            }
         }
     }
 
@@ -123,6 +145,36 @@ private fun CameraLayer(viewModel: ReceiveViewModel) {
         factory = { previewView },
         modifier = Modifier.fillMaxSize(),
     )
+}
+
+@Composable
+private fun CameraOptionsBar(
+    preferHighFrameRate: Boolean,
+    onPreferHighFrameRateChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.high_frame_rate),
+                color = Color.White,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                stringResource(R.string.manual_exposure_hint),
+                color = Color.White.copy(alpha = 0.65f),
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        Switch(
+            checked = preferHighFrameRate,
+            onCheckedChange = onPreferHighFrameRateChange,
+        )
+    }
 }
 
 @Composable
@@ -141,21 +193,35 @@ private fun TopBar(onClose: () -> Unit, onClear: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .statusBarsPadding()
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        TextButton(onClick = onClose) {
-            Text("\u2190  " + stringResource(R.string.close), color = Color.White)
-        }
+        ReceiveBarButton(onClick = onClose, label = "\u2190  " + stringResource(R.string.close))
         Text(
             stringResource(R.string.receiver_title),
             color = Color.White,
             style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
         )
-        TextButton(onClick = onClear) {
-            Text(stringResource(R.string.clear), color = Color.White)
-        }
+        ReceiveBarButton(onClick = onClear, label = stringResource(R.string.clear))
+    }
+}
+
+@Composable
+private fun ReceiveBarButton(onClick: () -> Unit, label: String) {
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier.defaultMinSize(minWidth = 88.dp, minHeight = 52.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp),
+    ) {
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+        )
     }
 }
 

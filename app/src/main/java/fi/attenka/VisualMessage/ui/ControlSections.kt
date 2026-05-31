@@ -133,6 +133,14 @@ fun RhythmSection(
     onUpdate: ((TransmissionSettings) -> TransmissionSettings) -> Unit,
 ) {
     GroupBox(title = stringResource(R.string.rhythm)) {
+        LabeledSlider(
+            title = stringResource(R.string.start_delay),
+            value = settings.startDelaySeconds.toFloat(),
+            valueRange = 1f..10f,
+            valueText = stringResource(R.string.value_start_delay, settings.startDelaySeconds),
+            onValueChange = { v -> onUpdate { it.copy(startDelaySeconds = v.roundToInt().coerceIn(1, 10)) } },
+        )
+
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.repeats), style = MaterialTheme.typography.bodyLarge)
             Spacer(Modifier.weight(1f))

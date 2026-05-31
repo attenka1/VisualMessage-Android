@@ -44,13 +44,21 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
         if (frames.isEmpty()) return
 
         isPlaying = true
-        progressText = getApplication<Application>().getString(R.string.sending)
-
-        if (settings.soundSignalEnabled) {
-            tonePlayer.playSignal(settings.signalFrequency)
-        }
 
         playbackJob = viewModelScope.launch {
+            // Give the user time to turn the phone before anything is shown or heard.
+            for (seconds in settings.startDelaySeconds downTo 1) {
+                if (!isActive) return@launch
+                progressText = seconds.toString()
+                delay(1000)
+            }
+
+            progressText = getApplication<Application>().getString(R.string.sending)
+
+            if (settings.soundSignalEnabled) {
+                tonePlayer.playSignal(settings.signalFrequency)
+            }
+
             frames.forEachIndexed { index, frame ->
                 if (!isActive) return@launch
                 currentFrame = frame

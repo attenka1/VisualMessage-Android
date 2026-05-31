@@ -55,6 +55,7 @@ class SettingsRepository(context: Context) {
         put("soundSignalEnabled", s.soundSignalEnabled)
         put("visualSignalEnabled", s.visualSignalEnabled)
         put("signalFrequency", s.signalFrequency)
+        put("startDelaySeconds", s.startDelaySeconds)
         put("morseUnitDuration", s.morseUnitDuration)
         put("morseAlphabet", s.morseAlphabet.name)
         put("customForeground", encodeColor(s.customForeground))
@@ -77,6 +78,7 @@ class SettingsRepository(context: Context) {
             soundSignalEnabled = json.optBoolean("soundSignalEnabled", defaults.soundSignalEnabled),
             visualSignalEnabled = json.optBoolean("visualSignalEnabled", defaults.visualSignalEnabled),
             signalFrequency = json.optDouble("signalFrequency", defaults.signalFrequency),
+            startDelaySeconds = json.optInt("startDelaySeconds", defaults.startDelaySeconds).coerceIn(1, 10),
             morseUnitDuration = json.optDouble("morseUnitDuration", defaults.morseUnitDuration),
             morseAlphabet = json.optEnum("morseAlphabet", defaults.morseAlphabet),
             customForeground = json.optColor("customForeground", defaults.customForeground),

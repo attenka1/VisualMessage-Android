@@ -26,6 +26,7 @@
 
     <string name="rhythm">Rhythm</string>
     <string name="repeats">Repeats</string>
+    <string name="start_delay">Start delay</string>
     <string name="character_duration">Character duration</string>
     <string name="character_gap">Character gap</string>
 
@@ -60,8 +61,11 @@
     <string name="waiting_for_signal">Waiting for signal\u2026</string>
     <string name="camera_permission_needed">Camera permission is required to receive morse code.</string>
     <string name="grant_permission">Grant permission</string>
+    <string name="high_frame_rate">High frame rate</string>
+    <string name="manual_exposure_hint">Fixed exposure after brief warmup (no auto AE)</string>
 
     <string name="value_wpm" translatable="false">%1$d WPM</string>
     <string name="value_hz" translatable="false">%1$d Hz</string>
     <string name="value_seconds" translatable="false">%1$.2f s</string>
+    <string name="value_start_delay" translatable="false">%1$d s</string>
 </resources>

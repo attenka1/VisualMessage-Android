@@ -22,6 +22,7 @@ data class TransmissionSettings(
     val soundSignalEnabled: Boolean = true,
     val visualSignalEnabled: Boolean = true,
     val signalFrequency: Double = 880.0,
+    val startDelaySeconds: Int = 3,
     val morseUnitDuration: Double = 0.3, // 4 WPM (unit = 1.2 / WPM)
     val morseAlphabet: MorseAlphabet = MorseAlphabet.INTERNATIONAL,
 ) {

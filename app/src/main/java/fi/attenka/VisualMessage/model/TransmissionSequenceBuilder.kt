@@ -13,7 +13,10 @@ object TransmissionSequenceBuilder {
         if (message.isEmpty()) return emptyList()
 
         val frames = mutableListOf<TransmissionFrame>()
-        frames += attentionFrames(settings)
+        // Morse uses only the configurable start delay before transmission; no logo intro.
+        if (settings.mode != TransmissionMode.MORSE) {
+            frames += attentionFrames(settings)
+        }
 
         val repeats = maxOf(1, settings.repeatCount)
         for (repeatIndex in 0 until repeats) {
@@ -25,6 +28,11 @@ object TransmissionSequenceBuilder {
             if (repeatIndex < repeats - 1) {
                 frames += TransmissionFrame(FrameKind.Blank, settings.characterDuration * 5)
             }
+        }
+
+        if (settings.mode == TransmissionMode.MORSE) {
+            // Hold the screen black briefly after the last morse mark.
+            frames += TransmissionFrame(FrameKind.Blank, settings.morseUnitDuration * 8)
         }
 
         return frames
