@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">Stafróf</string>
     <string name="attention_signal">Athyglismerki</string>
     <string name="background_color">Bakgrunnslitur</string>
-    <string name="character_duration">Lengd stafs</string>
+    <string name="camera_permission_needed">Myndavélarleyfi er nauðsynlegt til að taka á móti morse kóða.</string><string name="character_duration">Lengd stafs</string>
     <string name="character_gap">Stafabil</string>
-    <string name="colors">Litir</string>
+    <string name="clear">Hreinsa</string><string name="close">Loka</string><string name="colors">Litir</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Ritstjóralitir</string>
     <string name="frequency">Tíðni</string>
-    <string name="international">International</string>
-    <string name="message">Skilaboð</string>
+    <string name="grant_permission">Veita leyfi</string><string name="high_frame_rate">Hátt rammatíðni</string><string name="international">International</string>
+    <string name="manual_exposure_hint">Fast lýsing eftir stuttan upphitnun (engin sjálfvirk AE)</string><string name="message">Skilaboð</string>
     <string name="mode">Hamur</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Sjónrænt</string>
     <string name="morse_settings">Morse-stillingar</string>
     <string name="no_saved_messages">Engin vistuð skilaboð</string>
-    <string name="preset">Forstilling</string>
+    <string name="point_camera">Beindu myndavélinni að blikkaðri ljósi</string><string name="preset">Forstilling</string>
     <string name="ready">Tilbúið</string>
-    <string name="remove_from_saved">Fjarlægja úr vistuðum</string>
+    <string name="receive">Móttaka</string><string name="receiver_title">Morse móttakari</string><string name="remove_from_saved">Fjarlægja úr vistuðum</string>
     <string name="repeats">Endurtekningar</string>
-    <string name="save_message">Vista skilaboð</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">Vista skilaboð</string>
     <string name="saved_messages">Vistuð skilaboð</string>
     <string name="send">Senda</string>
     <string name="sending">Sendi…</string>
     <string name="signal_color">Merkjalitur</string>
     <string name="sound">Hljóð</string>
-    <string name="start_flash">Upphafsblossi</string>
+    <string name="speed">Speed</string><string name="start_delay">Röðun tafir</string><string name="start_flash">Upphafsblossi</string>
     <string name="stop">Stöðva</string>
     <string name="text_color">Textalitur</string>
     <string name="theme_black_orange">Svart / appelsínugult</string>
@@ -37,4 +38,4 @@
     <string name="transition">Umskipti</string>
     <string name="transition_fade">Deyfing</string>
     <string name="transition_instant">Strax</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">Bíð eftir merki…</string></resources>

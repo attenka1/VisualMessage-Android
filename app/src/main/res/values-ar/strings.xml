@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">الأبجدية</string>
     <string name="attention_signal">إشارة التنبيه</string>
     <string name="background_color">لون الخلفية</string>
-    <string name="character_duration">مدة الحرف</string>
+    <string name="camera_permission_needed">مطلوب إذن الكاميرا لاستقبال شفرة مورس.</string><string name="character_duration">مدة الحرف</string>
     <string name="character_gap">الفاصل بين الحروف</string>
-    <string name="colors">الألوان</string>
+    <string name="clear">مسح</string><string name="close">إغلاق</string><string name="colors">الألوان</string>
     <string name="continental">قاري</string>
     <string name="editor_colors">ألوان المحرر</string>
     <string name="frequency">التردد</string>
-    <string name="international">دولي</string>
-    <string name="message">رسالة</string>
+    <string name="grant_permission">منح الإذن</string><string name="high_frame_rate">معدل إطارات مرتفع</string><string name="international">دولي</string>
+    <string name="manual_exposure_hint">تعريض ثابت بعد إحماء قصير (بدون AE تلقائي)</string><string name="message">رسالة</string>
     <string name="mode">الوضع</string>
     <string name="mode_morse">مورس</string>
     <string name="mode_visual">مرئي</string>
     <string name="morse_settings">إعدادات مورس</string>
     <string name="no_saved_messages">لا توجد رسائل محفوظة</string>
-    <string name="preset">إعداد مسبق</string>
+    <string name="point_camera">وجّه الكاميرا نحو الضوء الوامض</string><string name="preset">إعداد مسبق</string>
     <string name="ready">جاهز</string>
-    <string name="remove_from_saved">إزالة من المحفوظات</string>
+    <string name="receive">استقبال</string><string name="receiver_title">مستقبل مورس</string><string name="remove_from_saved">إزالة من المحفوظات</string>
     <string name="repeats">التكرارات</string>
-    <string name="save_message">حفظ الرسالة</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">حفظ الرسالة</string>
     <string name="saved_messages">الرسائل المحفوظة</string>
     <string name="send">إرسال</string>
     <string name="sending">جارٍ الإرسال…</string>
     <string name="signal_color">لون الإشارة</string>
     <string name="sound">الصوت</string>
-    <string name="start_flash">وميض البداية</string>
+    <string name="speed">Speed</string><string name="start_delay">تأخير البدء</string><string name="start_flash">وميض البداية</string>
     <string name="stop">إيقاف</string>
     <string name="text_color">لون النص</string>
     <string name="theme_black_orange">أسود / برتقالي</string>
@@ -37,4 +38,4 @@
     <string name="transition">انتقال</string>
     <string name="transition_fade">تلاشٍ</string>
     <string name="transition_instant">فوري</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">في انتظار الإشارة…</string></resources>

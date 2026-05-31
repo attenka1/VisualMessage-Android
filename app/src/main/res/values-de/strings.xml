@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">Alphabet</string>
     <string name="attention_signal">Aufmerksamkeitssignal</string>
     <string name="background_color">Hintergrundfarbe</string>
-    <string name="character_duration">Zeichendauer</string>
+    <string name="camera_permission_needed">Kameraberechtigung ist erforderlich, um Morsecode zu empfangen.</string><string name="character_duration">Zeichendauer</string>
     <string name="character_gap">Zeichenabstand</string>
-    <string name="colors">Farben</string>
+    <string name="clear">Löschen</string><string name="close">Schließen</string><string name="colors">Farben</string>
     <string name="continental">Kontinental</string>
     <string name="editor_colors">Editorfarben</string>
     <string name="frequency">Frequenz</string>
-    <string name="international">International</string>
-    <string name="message">Nachricht</string>
+    <string name="grant_permission">Berechtigung erteilen</string><string name="high_frame_rate">Hohe Bildrate</string><string name="international">International</string>
+    <string name="manual_exposure_hint">Feste Belichtung nach kurzer Aufwärmphase (kein Auto-AE)</string><string name="message">Nachricht</string>
     <string name="mode">Modus</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Visuell</string>
     <string name="morse_settings">Morse-Einstellungen</string>
     <string name="no_saved_messages">Keine gespeicherten Nachrichten</string>
-    <string name="preset">Voreinstellung</string>
+    <string name="point_camera">Richten Sie die Kamera auf das blinkende Licht</string><string name="preset">Voreinstellung</string>
     <string name="ready">Bereit</string>
-    <string name="remove_from_saved">Aus Gespeicherten entfernen</string>
+    <string name="receive">Empfangen</string><string name="receiver_title">Morse-Empfänger</string><string name="remove_from_saved">Aus Gespeicherten entfernen</string>
     <string name="repeats">Wiederholungen</string>
-    <string name="save_message">Nachricht speichern</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">Nachricht speichern</string>
     <string name="saved_messages">Gespeicherte Nachrichten</string>
     <string name="send">Senden</string>
     <string name="sending">Senden…</string>
     <string name="signal_color">Signalfarbe</string>
     <string name="sound">Ton</string>
-    <string name="start_flash">Startblitz</string>
+    <string name="speed">Speed</string><string name="start_delay">Startverzögerung</string><string name="start_flash">Startblitz</string>
     <string name="stop">Stopp</string>
     <string name="text_color">Textfarbe</string>
     <string name="theme_black_orange">Schwarz / Orange</string>
@@ -37,4 +38,4 @@
     <string name="transition">Übergang</string>
     <string name="transition_fade">Überblenden</string>
     <string name="transition_instant">Sofort</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">Warte auf Signal…</string></resources>

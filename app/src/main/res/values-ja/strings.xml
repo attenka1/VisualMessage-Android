@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">アルファベット</string>
     <string name="attention_signal">注意信号</string>
     <string name="background_color">背景色</string>
-    <string name="character_duration">文字の表示時間</string>
+    <string name="camera_permission_needed">モールス符号を受信するにはカメラの許可が必要です。</string><string name="character_duration">文字の表示時間</string>
     <string name="character_gap">文字の間隔</string>
-    <string name="colors">色</string>
+    <string name="clear">クリア</string><string name="close">閉じる</string><string name="colors">色</string>
     <string name="continental">コンチネンタル</string>
     <string name="editor_colors">エディタの色</string>
     <string name="frequency">周波数</string>
-    <string name="international">国際</string>
-    <string name="message">メッセージ</string>
+    <string name="grant_permission">許可を与える</string><string name="high_frame_rate">高フレームレート</string><string name="international">国際</string>
+    <string name="manual_exposure_hint">短いウォームアップ後に固定露出（自動AEなし）</string><string name="message">メッセージ</string>
     <string name="mode">モード</string>
     <string name="mode_morse">モールス</string>
     <string name="mode_visual">ビジュアル</string>
     <string name="morse_settings">モールス設定</string>
     <string name="no_saved_messages">保存されたメッセージはありません</string>
-    <string name="preset">プリセット</string>
+    <string name="point_camera">点滅する光にカメラを向けてください</string><string name="preset">プリセット</string>
     <string name="ready">準備完了</string>
-    <string name="remove_from_saved">保存から削除</string>
+    <string name="receive">受信</string><string name="receiver_title">モールス受信機</string><string name="remove_from_saved">保存から削除</string>
     <string name="repeats">繰り返し</string>
-    <string name="save_message">メッセージを保存</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">メッセージを保存</string>
     <string name="saved_messages">保存したメッセージ</string>
     <string name="send">送信</string>
     <string name="sending">送信中…</string>
     <string name="signal_color">信号の色</string>
     <string name="sound">サウンド</string>
-    <string name="start_flash">開始フラッシュ</string>
+    <string name="speed">Speed</string><string name="start_delay">開始遅延</string><string name="start_flash">開始フラッシュ</string>
     <string name="stop">停止</string>
     <string name="text_color">文字色</string>
     <string name="theme_black_orange">黒 / オレンジ</string>
@@ -37,4 +38,4 @@
     <string name="transition">トランジション</string>
     <string name="transition_fade">フェード</string>
     <string name="transition_instant">即時</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">信号を待っています…</string></resources>

@@ -16,11 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VisualMessage">
 
-        <!-- AdMob application id. This is Google's official sample/test id; replace it
-             with the real production app id before publishing. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="${admobAppId}" />
 
         <activity
             android:name=".MainActivity"

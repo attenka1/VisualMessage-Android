@@ -1,5 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">VisualMessage</string>
+    <string name="app_name" translatable="false">VisualMessage</string>
 
     <string name="send">Send</string>
     <string name="ready">Ready</string>

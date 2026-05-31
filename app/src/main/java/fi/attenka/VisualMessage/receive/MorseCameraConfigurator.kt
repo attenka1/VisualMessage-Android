@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalCamera2Interop::class)
+
 package fi.attenka.VisualMessage.receive
 
 import android.content.Context
@@ -21,7 +23,6 @@ import kotlinx.coroutines.delay
  * Configures CameraX for morse reception: fixed analysis resolution, optional high fps,
  * and manual exposure (no AE hunting while decoding flashes).
  */
-@OptIn(ExperimentalCamera2Interop::class)
 object MorseCameraConfigurator {
 
     private const val ANALYSIS_WIDTH = 640
@@ -56,6 +57,7 @@ object MorseCameraConfigurator {
             ?: Range(STANDARD_FPS, STANDARD_FPS)
     }
 
+    @ExperimentalCamera2Interop
     fun buildPreview(fpsRange: Range<Int>): Preview {
         val builder = Preview.Builder()
         Camera2Interop.Extender(builder)
@@ -63,6 +65,7 @@ object MorseCameraConfigurator {
         return builder.build()
     }
 
+    @ExperimentalCamera2Interop
     fun buildAnalysis(fpsRange: Range<Int>): ImageAnalysis {
         val builder = ImageAnalysis.Builder()
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -73,6 +76,7 @@ object MorseCameraConfigurator {
     }
 
     /** Brief default-AE warmup, then lock to fixed ISO/shutter with AE off. */
+    @ExperimentalCamera2Interop
     suspend fun applyManualExposure(camera: Camera) {
         delay(WARMUP_MS)
         val camera2 = Camera2CameraControl.from(camera.cameraControl)

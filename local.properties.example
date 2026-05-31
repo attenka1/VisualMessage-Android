@@ -1,0 +1,14 @@
+# Copy to local.properties and fill in before Play Store release.
+# local.properties is gitignored — Android Studio also writes sdk.dir here.
+
+sdk.dir=/path/to/Android/sdk
+
+# AdMob (create Android app + banner unit in AdMob console for fi.attenka.VisualMessage)
+admob.app.id=ca-app-pub-3317951565050510~YOUR_ANDROID_APP_ID
+admob.banner.id=ca-app-pub-3317951565050510/YOUR_ANDROID_BANNER_ID
+
+# Release signing (optional until you build a signed AAB)
+release.store.file=keystore/visualmessage-release.jks
+release.store.password=
+release.key.alias=
+release.key.password=

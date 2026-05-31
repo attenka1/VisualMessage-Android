@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">Alfabet</string>
     <string name="attention_signal">Opmærksomhedssignal</string>
     <string name="background_color">Baggrundsfarve</string>
-    <string name="character_duration">Tegnvarighed</string>
+    <string name="camera_permission_needed">Kameratilladelse kræves for at modtage morsekode.</string><string name="character_duration">Tegnvarighed</string>
     <string name="character_gap">Tegnmellemrum</string>
-    <string name="colors">Farver</string>
+    <string name="clear">Ryd</string><string name="close">Luk</string><string name="colors">Farver</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Editorfarver</string>
     <string name="frequency">Frekvens</string>
-    <string name="international">International</string>
-    <string name="message">Besked</string>
+    <string name="grant_permission">Giv tilladelse</string><string name="high_frame_rate">Høj billedhastighed</string><string name="international">International</string>
+    <string name="manual_exposure_hint">Fast eksponering efter kort opvarmning (ingen auto-AE)</string><string name="message">Besked</string>
     <string name="mode">Tilstand</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Visuel</string>
     <string name="morse_settings">Morse-indstillinger</string>
     <string name="no_saved_messages">Ingen gemte beskeder</string>
-    <string name="preset">Forudindstilling</string>
+    <string name="point_camera">Peg kameraet mod det blinkende lys</string><string name="preset">Forudindstilling</string>
     <string name="ready">Klar</string>
-    <string name="remove_from_saved">Fjern fra gemte</string>
+    <string name="receive">Modtag</string><string name="receiver_title">Morse-modtager</string><string name="remove_from_saved">Fjern fra gemte</string>
     <string name="repeats">Gentagelser</string>
-    <string name="save_message">Gem besked</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">Gem besked</string>
     <string name="saved_messages">Gemte beskeder</string>
     <string name="send">Send</string>
     <string name="sending">Sender…</string>
     <string name="signal_color">Signalfarve</string>
     <string name="sound">Lyd</string>
-    <string name="start_flash">Startblink</string>
+    <string name="speed">Speed</string><string name="start_delay">Startforsinkelse</string><string name="start_flash">Startblink</string>
     <string name="stop">Stop</string>
     <string name="text_color">Tekstfarve</string>
     <string name="theme_black_orange">Sort / orange</string>
@@ -37,4 +38,4 @@
     <string name="transition">Overgang</string>
     <string name="transition_fade">Udtoning</string>
     <string name="transition_instant">Direkte</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">Venter på signal…</string></resources>

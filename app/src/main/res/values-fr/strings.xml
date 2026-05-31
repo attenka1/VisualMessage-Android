@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">Alphabet</string>
     <string name="attention_signal">Signal d’attention</string>
     <string name="background_color">Couleur de fond</string>
-    <string name="character_duration">Durée du caractère</string>
+    <string name="camera_permission_needed">L\'autorisation de la caméra est requise pour recevoir le code Morse.</string><string name="character_duration">Durée du caractère</string>
     <string name="character_gap">Écart entre caractères</string>
-    <string name="colors">Couleurs</string>
+    <string name="clear">Effacer</string><string name="close">Fermer</string><string name="colors">Couleurs</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Couleurs de l’éditeur</string>
     <string name="frequency">Fréquence</string>
-    <string name="international">International</string>
-    <string name="message">Message</string>
+    <string name="grant_permission">Accorder l\'autorisation</string><string name="high_frame_rate">Images par seconde élevées</string><string name="international">International</string>
+    <string name="manual_exposure_hint">Exposition fixe après un bref échauffement (pas d\'AE auto)</string><string name="message">Message</string>
     <string name="mode">Mode</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Visuel</string>
     <string name="morse_settings">Réglages Morse</string>
     <string name="no_saved_messages">Aucun message enregistré</string>
-    <string name="preset">Préréglage</string>
+    <string name="point_camera">Pointez la caméra vers la lumière clignotante</string><string name="preset">Préréglage</string>
     <string name="ready">Prêt</string>
-    <string name="remove_from_saved">Retirer des enregistrés</string>
+    <string name="receive">Recevoir</string><string name="receiver_title">Récepteur Morse</string><string name="remove_from_saved">Retirer des enregistrés</string>
     <string name="repeats">Répétitions</string>
-    <string name="save_message">Enregistrer le message</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">Enregistrer le message</string>
     <string name="saved_messages">Messages enregistrés</string>
     <string name="send">Envoyer</string>
     <string name="sending">Envoi…</string>
     <string name="signal_color">Couleur du signal</string>
     <string name="sound">Son</string>
-    <string name="start_flash">Flash de départ</string>
+    <string name="speed">Speed</string><string name="start_delay">Délai de départ</string><string name="start_flash">Flash de départ</string>
     <string name="stop">Arrêter</string>
     <string name="text_color">Couleur du texte</string>
     <string name="theme_black_orange">Noir / orange</string>
@@ -37,4 +38,4 @@
     <string name="transition">Transition</string>
     <string name="transition_fade">Fondu</string>
     <string name="transition_instant">Instantané</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">En attente du signal…</string></resources>

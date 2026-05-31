@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">Alfabet</string>
     <string name="attention_signal">Uppmärksamhetssignal</string>
     <string name="background_color">Bakgrundsfärg</string>
-    <string name="character_duration">Teckentid</string>
+    <string name="camera_permission_needed">Kamerabehörighet krävs för att ta emot morsekod.</string><string name="character_duration">Teckentid</string>
     <string name="character_gap">Teckenmellanrum</string>
-    <string name="colors">Färger</string>
+    <string name="clear">Rensa</string><string name="close">Stäng</string><string name="colors">Färger</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Redigerarfärger</string>
     <string name="frequency">Frekvens</string>
-    <string name="international">International</string>
-    <string name="message">Meddelande</string>
+    <string name="grant_permission">Bevilja behörighet</string><string name="high_frame_rate">Hög bildfrekvens</string><string name="international">International</string>
+    <string name="manual_exposure_hint">Fast exponering efter kort uppvärmning (ingen auto-AE)</string><string name="message">Meddelande</string>
     <string name="mode">Läge</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Visuell</string>
     <string name="morse_settings">Morse-inställningar</string>
     <string name="no_saved_messages">Inga sparade meddelanden</string>
-    <string name="preset">Förinställning</string>
+    <string name="point_camera">Rikta kameran mot det blinkande ljuset</string><string name="preset">Förinställning</string>
     <string name="ready">Klar</string>
-    <string name="remove_from_saved">Ta bort från sparade</string>
+    <string name="receive">Ta emot</string><string name="receiver_title">Morse-mottagare</string><string name="remove_from_saved">Ta bort från sparade</string>
     <string name="repeats">Upprepningar</string>
-    <string name="save_message">Spara meddelande</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">Spara meddelande</string>
     <string name="saved_messages">Sparade meddelanden</string>
     <string name="send">Skicka</string>
     <string name="sending">Skickar…</string>
     <string name="signal_color">Signalfärg</string>
     <string name="sound">Ljud</string>
-    <string name="start_flash">Startblink</string>
+    <string name="speed">Speed</string><string name="start_delay">Startfördröjning</string><string name="start_flash">Startblink</string>
     <string name="stop">Stoppa</string>
     <string name="text_color">Textfärg</string>
     <string name="theme_black_orange">Svart / orange</string>
@@ -37,4 +38,4 @@
     <string name="transition">Övergång</string>
     <string name="transition_fade">Tona</string>
     <string name="transition_instant">Direkt</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">Väntar på signal…</string></resources>

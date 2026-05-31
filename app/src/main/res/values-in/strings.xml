@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">Alfabet</string>
     <string name="attention_signal">Sinyal perhatian</string>
     <string name="background_color">Warna latar</string>
-    <string name="character_duration">Durasi karakter</string>
+    <string name="camera_permission_needed">Izin kamera diperlukan untuk menerima kode Morse.</string><string name="character_duration">Durasi karakter</string>
     <string name="character_gap">Jeda karakter</string>
-    <string name="colors">Warna</string>
+    <string name="clear">Hapus</string><string name="close">Tutup</string><string name="colors">Warna</string>
     <string name="continental">Kontinental</string>
     <string name="editor_colors">Warna editor</string>
     <string name="frequency">Frekuensi</string>
-    <string name="international">Internasional</string>
-    <string name="message">Pesan</string>
+    <string name="grant_permission">Berikan izin</string><string name="high_frame_rate">Kecepatan bingkai tinggi</string><string name="international">Internasional</string>
+    <string name="manual_exposure_hint">Eksposur tetap setelah pemanasan singkat (tanpa AE otomatis)</string><string name="message">Pesan</string>
     <string name="mode">Mode</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Visual</string>
     <string name="morse_settings">Pengaturan Morse</string>
     <string name="no_saved_messages">Tidak ada pesan tersimpan</string>
-    <string name="preset">Prasetel</string>
+    <string name="point_camera">Arahkan kamera ke lampu yang berkedip</string><string name="preset">Prasetel</string>
     <string name="ready">Siap</string>
-    <string name="remove_from_saved">Hapus dari tersimpan</string>
+    <string name="receive">Terima</string><string name="receiver_title">Penerima Morse</string><string name="remove_from_saved">Hapus dari tersimpan</string>
     <string name="repeats">Pengulangan</string>
-    <string name="save_message">Simpan pesan</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">Simpan pesan</string>
     <string name="saved_messages">Pesan tersimpan</string>
     <string name="send">Kirim</string>
     <string name="sending">Mengirim…</string>
     <string name="signal_color">Warna sinyal</string>
     <string name="sound">Suara</string>
-    <string name="start_flash">Kilatan awal</string>
+    <string name="speed">Speed</string><string name="start_delay">Penundaan mulai</string><string name="start_flash">Kilatan awal</string>
     <string name="stop">Berhenti</string>
     <string name="text_color">Warna teks</string>
     <string name="theme_black_orange">Hitam / oranye</string>
@@ -37,4 +38,4 @@
     <string name="transition">Transisi</string>
     <string name="transition_fade">Pudar</string>
     <string name="transition_instant">Instan</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">Menunggu sinyal…</string></resources>

@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">Алфавит</string>
     <string name="attention_signal">Сигнал внимания</string>
     <string name="background_color">Цвет фона</string>
-    <string name="character_duration">Длительность символа</string>
+    <string name="camera_permission_needed">Для приёма азбуки Морзе требуется разрешение камеры.</string><string name="character_duration">Длительность символа</string>
     <string name="character_gap">Интервал между символами</string>
-    <string name="colors">Цвета</string>
+    <string name="clear">Очистить</string><string name="close">Закрыть</string><string name="colors">Цвета</string>
     <string name="continental">Континентальный</string>
     <string name="editor_colors">Цвета редактора</string>
     <string name="frequency">Частота</string>
-    <string name="international">Международный</string>
-    <string name="message">Сообщение</string>
+    <string name="grant_permission">Предоставить разрешение</string><string name="high_frame_rate">Высокая частота кадров</string><string name="international">Международный</string>
+    <string name="manual_exposure_hint">Фиксированная экспозиция после короткой подготовки (без авто AE)</string><string name="message">Сообщение</string>
     <string name="mode">Режим</string>
     <string name="mode_morse">Морзе</string>
     <string name="mode_visual">Визуально</string>
     <string name="morse_settings">Настройки Морзе</string>
     <string name="no_saved_messages">Нет сохранённых сообщений</string>
-    <string name="preset">Пресет</string>
+    <string name="point_camera">Направьте камеру на мигающий свет</string><string name="preset">Пресет</string>
     <string name="ready">Готово</string>
-    <string name="remove_from_saved">Удалить из сохранённых</string>
+    <string name="receive">Приём</string><string name="receiver_title">Приёмник Morse</string><string name="remove_from_saved">Удалить из сохранённых</string>
     <string name="repeats">Повторы</string>
-    <string name="save_message">Сохранить сообщение</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">Сохранить сообщение</string>
     <string name="saved_messages">Сохранённые сообщения</string>
     <string name="send">Отправить</string>
     <string name="sending">Отправка…</string>
     <string name="signal_color">Цвет сигнала</string>
     <string name="sound">Звук</string>
-    <string name="start_flash">Стартовая вспышка</string>
+    <string name="speed">Speed</string><string name="start_delay">Задержка старта</string><string name="start_flash">Стартовая вспышка</string>
     <string name="stop">Стоп</string>
     <string name="text_color">Цвет текста</string>
     <string name="theme_black_orange">Чёрный / оранжевый</string>
@@ -37,4 +38,4 @@
     <string name="transition">Переход</string>
     <string name="transition_fade">Затухание</string>
     <string name="transition_instant">Мгновенно</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">Ожидание сигнала…</string></resources>

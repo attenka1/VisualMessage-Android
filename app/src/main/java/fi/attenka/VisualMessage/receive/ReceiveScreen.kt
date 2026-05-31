@@ -57,10 +57,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fi.attenka.VisualMessage.R
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@ExperimentalCamera2Interop
 @Composable
 fun ReceiveScreen(onClose: () -> Unit) {
     val context = LocalContext.current
@@ -99,7 +101,7 @@ fun ReceiveScreen(onClose: () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalCamera2Interop::class)
+@ExperimentalCamera2Interop
 @Composable
 private fun CameraLayer(viewModel: ReceiveViewModel) {
     val context = LocalContext.current
@@ -113,28 +115,7 @@ private fun CameraLayer(viewModel: ReceiveViewModel) {
             ProcessCameraProvider.getInstance(context).get()
         }
         cameraProvider = provider
-
-        val fpsRange = MorseCameraConfigurator.selectFpsRange(context, viewModel.preferHighFrameRate)
-        val preview = MorseCameraConfigurator.buildPreview(fpsRange).apply {
-            setSurfaceProvider(previewView.surfaceProvider)
-        }
-        val analysis = MorseCameraConfigurator.buildAnalysis(fpsRange).apply {
-            setAnalyzer(ContextCompat.getMainExecutor(context), viewModel.analyzer)
-        }
-
-        val owner = context.findLifecycleOwner()
-        if (owner != null) {
-            provider.unbindAll()
-            val camera = provider.bindToLifecycle(
-                owner,
-                CameraSelector.DEFAULT_BACK_CAMERA,
-                preview,
-                analysis,
-            )
-            launch {
-                runCatching { MorseCameraConfigurator.applyManualExposure(camera) }
-            }
-        }
+        bindMorseCamera(this, context, previewView, viewModel, provider)
     }
 
     DisposableEffect(Unit) {
@@ -145,6 +126,35 @@ private fun CameraLayer(viewModel: ReceiveViewModel) {
         factory = { previewView },
         modifier = Modifier.fillMaxSize(),
     )
+}
+
+@ExperimentalCamera2Interop
+private suspend fun bindMorseCamera(
+    scope: CoroutineScope,
+    context: Context,
+    previewView: PreviewView,
+    viewModel: ReceiveViewModel,
+    provider: ProcessCameraProvider,
+) {
+    val fpsRange = MorseCameraConfigurator.selectFpsRange(context, viewModel.preferHighFrameRate)
+    val preview = MorseCameraConfigurator.buildPreview(fpsRange).apply {
+        setSurfaceProvider(previewView.surfaceProvider)
+    }
+    val analysis = MorseCameraConfigurator.buildAnalysis(fpsRange).apply {
+        setAnalyzer(ContextCompat.getMainExecutor(context), viewModel.analyzer)
+    }
+
+    val owner = context.findLifecycleOwner() ?: return
+    provider.unbindAll()
+    val camera = provider.bindToLifecycle(
+        owner,
+        CameraSelector.DEFAULT_BACK_CAMERA,
+        preview,
+        analysis,
+    )
+    scope.launch {
+        runCatching { MorseCameraConfigurator.applyManualExposure(camera) }
+    }
 }
 
 @Composable

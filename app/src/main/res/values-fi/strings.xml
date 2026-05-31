@@ -1,31 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">Aakkosto</string>
     <string name="attention_signal">Huomiosignaali</string>
     <string name="background_color">Taustaväri</string>
-    <string name="character_duration">Merkin kesto</string>
+    <string name="camera_permission_needed">Kameran käyttöoikeus tarvitaan morsekoodin vastaanottamiseen.</string><string name="character_duration">Merkin kesto</string>
     <string name="character_gap">Merkkitauko</string>
-    <string name="colors">Värit</string>
+    <string name="clear">Tyhjennä</string><string name="close">Sulje</string><string name="colors">Värit</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Kirjoitusvärit</string>
     <string name="frequency">Taajuus</string>
+    <string name="grant_permission">Myönnä lupa</string><string name="high_frame_rate">Korkea kuvanopeus</string>
     <string name="international">International</string>
-    <string name="message">Viesti</string>
+    <string name="manual_exposure_hint">Kiinteä valotus lyhyen alustuksen jälkeen (ei automaattia)</string>
+<string name="message">Viesti</string>
     <string name="mode">Tila</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Graafinen</string>
     <string name="morse_settings">Morse-asetukset</string>
     <string name="no_saved_messages">Ei tallennettuja viestejä</string>
-    <string name="preset">Esiasetus</string>
+    <string name="point_camera">Osoita kameraa vilkkuvaan valoon</string><string name="preset">Esiasetus</string>
     <string name="ready">Valmis</string>
-    <string name="remove_from_saved">Poista tallennetuista</string>
+    <string name="receive">Vastaanota</string><string name="receiver_title">Morse-vastaanotin</string><string name="remove_from_saved">Poista tallennetuista</string>
     <string name="repeats">Toistot</string>
-    <string name="start_delay">Lähtöviive</string>
-    <string name="save_message">Tallenna viesti</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">Tallenna viesti</string>
     <string name="saved_messages">Tallennetut viestit</string>
     <string name="send">Lähetä</string>
     <string name="sending">Lähetetään…</string>
     <string name="signal_color">Lähetysväri</string>
     <string name="sound">Ääni</string>
+    <string name="speed">Speed</string><string name="start_delay">Lähtöviive</string>
     <string name="start_flash">Aloitusvälähdys</string>
     <string name="stop">Pysäytä</string>
     <string name="text_color">Tekstin väri</string>
@@ -38,6 +41,4 @@
     <string name="transition">Siirtymä</string>
     <string name="transition_fade">Häivytys</string>
     <string name="transition_instant">Suora</string>
-    <string name="high_frame_rate">Korkea kuvanopeus</string>
-    <string name="manual_exposure_hint">Kiinteä valotus lyhyen alustuksen jälkeen (ei automaattia)</string>
-</resources>
+    <string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">Odotetaan signaalia…</string></resources>

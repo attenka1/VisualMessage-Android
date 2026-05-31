@@ -39,15 +39,7 @@ fun AdBannerHost(modifier: Modifier = Modifier) {
 }
 
 object AdMobConfiguration {
-    /**
-     * In debug builds we use Google's official sample banner unit, which always serves
-     * test ads. The release id below is a placeholder and must be replaced with the real
-     * Android banner ad unit id before publishing.
-     */
+    /** Set admob.banner.id in local.properties for release builds. */
     val bannerAdUnitID: String
-        get() = if (BuildConfig.DEBUG) {
-            "ca-app-pub-3940256099942544/6300978111"
-        } else {
-            "ca-app-pub-3940256099942544/6300978111"
-        }
+        get() = BuildConfig.ADMOB_BANNER_ID
 }

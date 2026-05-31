@@ -1,31 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="alphabet">字母表</string>
     <string name="attention_signal">提示信号</string>
     <string name="background_color">背景颜色</string>
-    <string name="character_duration">字符时长</string>
+    <string name="camera_permission_needed">接收莫尔斯电码需要相机权限。</string><string name="character_duration">字符时长</string>
     <string name="character_gap">字符间隔</string>
-    <string name="colors">颜色</string>
+    <string name="clear">清除</string><string name="close">关闭</string><string name="colors">颜色</string>
     <string name="continental">大陆</string>
     <string name="editor_colors">编辑器颜色</string>
     <string name="frequency">频率</string>
-    <string name="international">国际</string>
-    <string name="message">消息</string>
+    <string name="grant_permission">授予权限</string><string name="high_frame_rate">高帧率</string><string name="international">国际</string>
+    <string name="manual_exposure_hint">短暂预热后固定曝光（无自动 AE）</string><string name="message">消息</string>
     <string name="mode">模式</string>
     <string name="mode_morse">摩尔斯</string>
     <string name="mode_visual">视觉</string>
     <string name="morse_settings">摩尔斯设置</string>
     <string name="no_saved_messages">没有已保存的消息</string>
-    <string name="preset">预设</string>
+    <string name="point_camera">将相机对准闪烁的光</string><string name="preset">预设</string>
     <string name="ready">就绪</string>
-    <string name="remove_from_saved">从已保存中移除</string>
+    <string name="receive">接收</string><string name="receiver_title">莫尔斯接收器</string><string name="remove_from_saved">从已保存中移除</string>
     <string name="repeats">重复次数</string>
-    <string name="save_message">保存消息</string>
+    <string name="rhythm">Rhythm</string><string name="save_message">保存消息</string>
     <string name="saved_messages">已保存的消息</string>
     <string name="send">发送</string>
     <string name="sending">发送中…</string>
     <string name="signal_color">信号颜色</string>
     <string name="sound">声音</string>
-    <string name="start_flash">开始闪光</string>
+    <string name="speed">Speed</string><string name="start_delay">启动延迟</string><string name="start_flash">开始闪光</string>
     <string name="stop">停止</string>
     <string name="text_color">文字颜色</string>
     <string name="theme_black_orange">黑 / 橙</string>
@@ -37,4 +38,4 @@
     <string name="transition">过渡</string>
     <string name="transition_fade">淡入淡出</string>
     <string name="transition_instant">即时</string>
-</resources>
+<string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">等待信号…</string></resources>
