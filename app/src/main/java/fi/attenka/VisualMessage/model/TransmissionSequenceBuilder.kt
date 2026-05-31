@@ -92,7 +92,7 @@ object TransmissionSequenceBuilder {
                     frames += TransmissionFrame(FrameKind.MorseSignal, unit * (if (signal == '-') 3.0 else 1.0))
 
                     if (signalIndex < signals.size - 1) {
-                        frames += TransmissionFrame(FrameKind.Blank, unit * 2) // standard 1 + 1
+                        frames += TransmissionFrame(FrameKind.Blank, unit)
                     }
                 }
 
@@ -102,7 +102,7 @@ object TransmissionSequenceBuilder {
             }
 
             if (wordIndex < words.size - 1) {
-                frames += TransmissionFrame(FrameKind.Blank, unit * 9)
+                frames += TransmissionFrame(FrameKind.Blank, unit * 8)
             }
         }
 

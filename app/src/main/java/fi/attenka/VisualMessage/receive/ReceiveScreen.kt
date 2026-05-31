@@ -12,7 +12,6 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -129,21 +127,12 @@ private fun CameraLayer(viewModel: ReceiveViewModel) {
 
 @Composable
 private fun AimBox() {
-    val color = Color.White.copy(alpha = 0.7f)
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
                 .fillMaxSize(LuminanceAnalyzer.ROI_FRACTION)
-                .border(2.dp, color, RoundedCornerShape(12.dp)),
-        ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val stroke = 1.5.dp.toPx()
-                // Corner-to-corner crosshair; the lines meet at the centre target point.
-                drawLine(color, Offset(0f, 0f), Offset(size.width, size.height), strokeWidth = stroke)
-                drawLine(color, Offset(size.width, 0f), Offset(0f, size.height), strokeWidth = stroke)
-                drawCircle(Color.White, radius = 3.dp.toPx(), center = center)
-            }
-        }
+                .border(2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(12.dp)),
+        )
     }
 }
 
