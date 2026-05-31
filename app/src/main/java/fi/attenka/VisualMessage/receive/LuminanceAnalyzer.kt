@@ -52,7 +52,7 @@ class LuminanceAnalyzer(
 
     companion object {
         /** Fraction of the frame width/height analysed (and shown as the aim box). */
-        const val ROI_FRACTION = 0.25f
+        const val ROI_FRACTION = 0.4f
         private val STEP = max(1, 4)
     }
 }
