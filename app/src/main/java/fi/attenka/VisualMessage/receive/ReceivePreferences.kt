@@ -9,7 +9,7 @@ class ReceivePreferences(context: Context) {
         .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     var preferHighFrameRate: Boolean
-        get() = prefs.getBoolean(KEY_HIGH_FPS, false)
+        get() = prefs.getBoolean(KEY_HIGH_FPS, true)
         set(value) = prefs.edit().putBoolean(KEY_HIGH_FPS, value).apply()
 
     companion object {
