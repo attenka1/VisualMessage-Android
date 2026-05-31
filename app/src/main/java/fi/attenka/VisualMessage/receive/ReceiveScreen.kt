@@ -130,7 +130,7 @@ private fun AimBox() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
-                .fillMaxSize(0.4f)
+                .fillMaxSize(LuminanceAnalyzer.ROI_FRACTION)
                 .border(2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(12.dp)),
         )
     }

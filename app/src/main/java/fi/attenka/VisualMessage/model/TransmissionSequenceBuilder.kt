@@ -33,12 +33,9 @@ object TransmissionSequenceBuilder {
     private fun attentionFrames(settings: TransmissionSettings): List<TransmissionFrame> {
         if (!settings.visualSignalEnabled) return emptyList()
 
+        // Show the logo once for 2 seconds (no flashing), then a short blank before the message.
         return listOf(
-            TransmissionFrame(FrameKind.AppLogo, 0.16),
-            TransmissionFrame(FrameKind.Blank, 0.08),
-            TransmissionFrame(FrameKind.AppLogo, 0.16),
-            TransmissionFrame(FrameKind.Blank, 0.08),
-            TransmissionFrame(FrameKind.AppLogo, 0.16),
+            TransmissionFrame(FrameKind.AppLogo, 2.0),
             TransmissionFrame(FrameKind.Blank, 0.35),
         )
     }
