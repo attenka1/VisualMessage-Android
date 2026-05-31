@@ -97,12 +97,12 @@ object TransmissionSequenceBuilder {
                 }
 
                 if (letterIndex < letters.size - 1) {
-                    frames += TransmissionFrame(FrameKind.Blank, unit * 5) // standard 3 + 2
+                    frames += TransmissionFrame(FrameKind.Blank, unit * 4)
                 }
             }
 
             if (wordIndex < words.size - 1) {
-                frames += TransmissionFrame(FrameKind.Blank, unit * 9) // standard 7 + 2
+                frames += TransmissionFrame(FrameKind.Blank, unit * 9)
             }
         }
 
