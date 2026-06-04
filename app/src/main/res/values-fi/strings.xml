@@ -8,11 +8,24 @@
     <string name="clear">Tyhjennä</string><string name="close">Sulje</string><string name="colors">Värit</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Kirjoitusvärit</string>
-    <string name="frequency">Taajuus</string>
-    <string name="grant_permission">Myönnä lupa</string><string name="high_frame_rate">Korkea kuvanopeus</string>
+    <string name="emoji_duration">Emojin kesto</string><string name="frequency">Taajuus</string>
+    <string name="grant_permission">Myönnä lupa</string><string name="help">Ohje</string>
+    <string name="help_title">Ohje</string>
+    <string name="help_summary">Kirjoita viesti, valitse Graafinen tai Morse ja lähetä. Graafinen näyttää viestin ruudulla; Morse lähettää koodia valolla ja halutessa äänellä.</string>
+    <string name="help_visual_title">Graafinen tila</string>
+    <string name="help_visual_body">Valitse tekstin siirtymä. Slide-suunta ohjaa LTR/RTL-liikettä; Slide pysty pinoaa sanan kirjaimet allekkain.</string>
+    <string name="help_morse_title">Morse-tila</string>
+    <string name="help_morse_body">International on tavallinen morseaakkosto. Continental käyttää International-aakkostoa ja lisää alla näkyvät merkit.</string>
+    <string name="help_continental_note">Sama kuin International, lisäksi:</string>
+    <string name="high_frame_rate">Korkea kuvanopeus</string>
     <string name="international">International</string>
     <string name="manual_exposure_hint">Kiinteä valotus lyhyen alustuksen jälkeen (ei automaattia)</string>
 <string name="message">Viesti</string>
+    <string name="uppercase_mode">Isot kirjaimet</string>
+    <string name="slide_direction">Slide-suunta</string>
+    <string name="slide_direction_auto">Auto</string>
+    <string name="slide_direction_ltr">LTR</string>
+    <string name="slide_direction_rtl">RTL</string>
     <string name="mode">Tila</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Graafinen</string>
@@ -28,6 +41,7 @@
     <string name="sending">Lähetetään…</string>
     <string name="signal_color">Lähetysväri</string>
     <string name="sound">Ääni</string>
+    <string name="torch_signal">Käytä taskulamppua Morseen</string>
     <string name="speed">Speed</string><string name="start_delay">Lähtöviive</string>
     <string name="start_flash">Aloitusvälähdys</string>
     <string name="stop">Pysäytä</string>
@@ -41,4 +55,4 @@
     <string name="transition">Siirtymä</string>
     <string name="transition_fade">Häivytys</string>
     <string name="transition_instant">Suora</string>
-    <string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="waiting_for_signal">Odotetaan signaalia…</string></resources>
+    <string name="transition_scale">Scale</string><string name="transition_slide">Slide</string><string name="transition_slide_vertical">Slide pysty</string><string name="waiting_for_signal">Odotetaan signaalia…</string></resources>

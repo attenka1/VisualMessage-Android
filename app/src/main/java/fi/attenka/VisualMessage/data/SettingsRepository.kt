@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import fi.attenka.VisualMessage.model.MessageLibrary
 import fi.attenka.VisualMessage.model.MorseAlphabet
+import fi.attenka.VisualMessage.model.SlideDirection
 import fi.attenka.VisualMessage.model.TransmissionMode
 import fi.attenka.VisualMessage.model.TransmissionSettings
 import fi.attenka.VisualMessage.model.TransitionStyle
@@ -48,12 +49,16 @@ class SettingsRepository(context: Context) {
         put("mode", s.mode.name)
         put("themeID", s.themeID)
         put("customEditorColorsEnabled", s.customEditorColorsEnabled)
+        put("slideDirection", s.slideDirection.name)
+        put("uppercaseEnabled", s.uppercaseEnabled)
         put("characterDuration", s.characterDuration)
+        put("emojiDuration", s.emojiDuration)
         put("characterGap", s.characterGap)
         put("repeatCount", s.repeatCount)
         put("transitionStyle", s.transitionStyle.name)
         put("soundSignalEnabled", s.soundSignalEnabled)
         put("visualSignalEnabled", s.visualSignalEnabled)
+        put("torchSignalEnabled", s.torchSignalEnabled)
         put("signalFrequency", s.signalFrequency)
         put("startDelaySeconds", s.startDelaySeconds)
         put("morseUnitDuration", s.morseUnitDuration)
@@ -71,12 +76,16 @@ class SettingsRepository(context: Context) {
             mode = json.optEnum("mode", defaults.mode),
             themeID = json.optString("themeID", defaults.themeID),
             customEditorColorsEnabled = json.optBoolean("customEditorColorsEnabled", defaults.customEditorColorsEnabled),
+            slideDirection = json.optSlideDirection(defaults.slideDirection),
+            uppercaseEnabled = json.optBoolean("uppercaseEnabled", defaults.uppercaseEnabled),
             characterDuration = json.optDouble("characterDuration", defaults.characterDuration),
+            emojiDuration = json.optDouble("emojiDuration", defaults.emojiDuration),
             characterGap = json.optDouble("characterGap", defaults.characterGap),
             repeatCount = json.optInt("repeatCount", defaults.repeatCount),
             transitionStyle = json.optEnum("transitionStyle", defaults.transitionStyle),
             soundSignalEnabled = json.optBoolean("soundSignalEnabled", defaults.soundSignalEnabled),
             visualSignalEnabled = json.optBoolean("visualSignalEnabled", defaults.visualSignalEnabled),
+            torchSignalEnabled = json.optBoolean("torchSignalEnabled", defaults.torchSignalEnabled),
             signalFrequency = json.optDouble("signalFrequency", defaults.signalFrequency),
             startDelaySeconds = json.optInt("startDelaySeconds", defaults.startDelaySeconds).coerceIn(1, 10),
             morseUnitDuration = json.optDouble("morseUnitDuration", defaults.morseUnitDuration),
@@ -113,6 +122,20 @@ class SettingsRepository(context: Context) {
     private inline fun <reified T : Enum<T>> JSONObject.optEnum(key: String, fallback: T): T {
         val name = optString(key, fallback.name)
         return runCatching { enumValueOf<T>(name) }.getOrDefault(fallback)
+    }
+
+    private fun JSONObject.optSlideDirection(fallback: SlideDirection): SlideDirection {
+        val name = optString("slideDirection", "")
+        if (name.isNotEmpty()) {
+            return runCatching { SlideDirection.valueOf(name) }.getOrDefault(fallback)
+        }
+
+        return when (optString("messageLanguage", "")) {
+            "LEFT_TO_RIGHT" -> SlideDirection.LTR
+            "ARABIC", "URDU" -> SlideDirection.RTL
+            "AUTO" -> SlideDirection.AUTO
+            else -> fallback
+        }
     }
 
     companion object {

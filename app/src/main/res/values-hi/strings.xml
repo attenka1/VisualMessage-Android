@@ -8,7 +8,7 @@
     <string name="clear">साफ़ करें</string><string name="close">बंद करें</string><string name="colors">रंग</string>
     <string name="continental">कॉन्टिनेंटल</string>
     <string name="editor_colors">एडिटर रंग</string>
-    <string name="frequency">आवृत्ति</string>
+    <string name="emoji_duration">इमोजी अवधि</string><string name="frequency">आवृत्ति</string>
     <string name="grant_permission">अनुमति दें</string><string name="high_frame_rate">उच्च फ्रेम दर</string><string name="international">अंतरराष्ट्रीय</string>
     <string name="manual_exposure_hint">संक्षिप्त वार्मअप के बाद निश्चित एक्सपोज़र (कोई ऑटो AE नहीं)</string><string name="message">संदेश</string>
     <string name="mode">मोड</string>

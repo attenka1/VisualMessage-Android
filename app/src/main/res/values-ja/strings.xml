@@ -8,7 +8,7 @@
     <string name="clear">クリア</string><string name="close">閉じる</string><string name="colors">色</string>
     <string name="continental">コンチネンタル</string>
     <string name="editor_colors">エディタの色</string>
-    <string name="frequency">周波数</string>
+    <string name="emoji_duration">絵文字の表示時間</string><string name="frequency">周波数</string>
     <string name="grant_permission">許可を与える</string><string name="high_frame_rate">高フレームレート</string><string name="international">国際</string>
     <string name="manual_exposure_hint">短いウォームアップ後に固定露出（自動AEなし）</string><string name="message">メッセージ</string>
     <string name="mode">モード</string>

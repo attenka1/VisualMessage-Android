@@ -8,7 +8,7 @@
     <string name="clear">Ryd</string><string name="close">Luk</string><string name="colors">Farver</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Editorfarver</string>
-    <string name="frequency">Frekvens</string>
+    <string name="emoji_duration">Emoji-varighed</string><string name="frequency">Frekvens</string>
     <string name="grant_permission">Giv tilladelse</string><string name="high_frame_rate">Høj billedhastighed</string><string name="international">International</string>
     <string name="manual_exposure_hint">Fast eksponering efter kort opvarmning (ingen auto-AE)</string><string name="message">Besked</string>
     <string name="mode">Tilstand</string>

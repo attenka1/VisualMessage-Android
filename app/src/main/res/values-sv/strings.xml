@@ -8,7 +8,7 @@
     <string name="clear">Rensa</string><string name="close">Stäng</string><string name="colors">Färger</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Redigerarfärger</string>
-    <string name="frequency">Frekvens</string>
+    <string name="emoji_duration">Emoji-varaktighet</string><string name="frequency">Frekvens</string>
     <string name="grant_permission">Bevilja behörighet</string><string name="high_frame_rate">Hög bildfrekvens</string><string name="international">International</string>
     <string name="manual_exposure_hint">Fast exponering efter kort uppvärmning (ingen auto-AE)</string><string name="message">Meddelande</string>
     <string name="mode">Läge</string>

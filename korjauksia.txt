@@ -1,0 +1,18 @@
+1.0.2 (2)
+
+Added the option to flash Morse code using the phone's flashlight. Fixed an image issue caused when using the Samsung Galaxy S25 in portrait mode.
+
+Update video.
+https://youtube.com/shorts/UPj23yNDy_I?feature=share
+
+Improved the Slide mode so text now scrolls smoothly as one continuous line from right to left. Fixed portrait-mode issues where the first characters could disappear before becoming visible. Reworked the rendering to use direct Canvas drawing for more reliable positioning across screen orientations. Adjusted timing so the animation starts cleanly and returns faster after the text leaves the screen.
+
+1.0.3 (4)
+
+Added a Help view with a compact guide and Morse code tables for International and Continental alphabets.
+
+Added Slide vertical mode, where text scrolls vertically as word-based letter stacks. Improved Slide direction handling with Auto, LTR, and RTL options.
+
+Added an Uppercase option for message writing.
+
+Updated AndroidX dependencies for better Android 16 KB page size compatibility.

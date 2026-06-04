@@ -8,7 +8,7 @@
     <string name="clear">Tøm</string><string name="close">Lukk</string><string name="colors">Farger</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Redigeringsfarger</string>
-    <string name="frequency">Frekvens</string>
+    <string name="emoji_duration">Emoji-varighet</string><string name="frequency">Frekvens</string>
     <string name="grant_permission">Gi tillatelse</string><string name="high_frame_rate">Høy bildefrekvens</string><string name="international">International</string>
     <string name="manual_exposure_hint">Fast eksponering etter kort oppvarming (ingen auto-AE)</string><string name="message">Melding</string>
     <string name="mode">Modus</string>

@@ -1,5 +1,6 @@
 package fi.attenka.VisualMessage.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,29 +8,32 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import fi.attenka.VisualMessage.R
 import fi.attenka.VisualMessage.model.MessageLibrary
 import fi.attenka.VisualMessage.model.MorseAlphabet
+import fi.attenka.VisualMessage.model.SlideDirection
 import fi.attenka.VisualMessage.model.TransitionStyle
 import fi.attenka.VisualMessage.model.TransmissionMode
 import fi.attenka.VisualMessage.model.TransmissionSettings
-import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.res.stringResource
 import kotlin.math.roundToInt
 
 @Composable
@@ -50,7 +54,9 @@ fun MessageSection(
                 MessageTemplatesControls(
                     library = library,
                     message = settings.message,
-                    onSelectMessage = { selected -> onUpdate { it.copy(message = selected) } },
+                    onSelectMessage = { selected ->
+                        onUpdate { it.copy(message = selected.withUppercaseMode(it.uppercaseEnabled)) }
+                    },
                     onLibraryChange = onLibraryChange,
                 )
             }
@@ -66,19 +72,50 @@ fun MessageSection(
             else -> MaterialTheme.colorScheme.onSurface
         }
 
-        BasicTextField(
-            value = settings.message,
-            onValueChange = { value -> onUpdate { it.copy(message = value) } },
-            textStyle = TextStyle(color = editorForeground, fontSize = 22.sp, fontWeight = FontWeight.Medium),
-            cursorBrush = SolidColor(editorForeground),
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 120.dp)
-                .background(editorBackground, RoundedCornerShape(8.dp))
-                .padding(12.dp),
+        val editorDirection = settings.slideDirection.layoutDirectionOrNull() ?: LocalLayoutDirection.current
+        CompositionLocalProvider(LocalLayoutDirection provides editorDirection) {
+            BasicTextField(
+                value = settings.message,
+                onValueChange = { value ->
+                    onUpdate { it.copy(message = value.withUppercaseMode(it.uppercaseEnabled)) }
+                },
+                textStyle = TextStyle(color = editorForeground, fontSize = 22.sp, fontWeight = FontWeight.Medium),
+                cursorBrush = SolidColor(editorForeground),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 120.dp)
+                    .background(editorBackground, RoundedCornerShape(8.dp))
+                    .padding(12.dp),
+            )
+        }
+
+        ToggleRow(
+            label = stringResource(R.string.uppercase_mode),
+            checked = settings.uppercaseEnabled,
+            onCheckedChange = { enabled ->
+                onUpdate { it.copy(uppercaseEnabled = enabled, message = it.message.withUppercaseMode(enabled)) }
+            },
+        )
+
+        Text(stringResource(R.string.slide_direction), style = MaterialTheme.typography.labelLarge)
+        EnumSegmented(
+            options = SlideDirection.entries,
+            selected = settings.slideDirection,
+            labelKey = { it.titleKey },
+            onSelect = { direction -> onUpdate { it.copy(slideDirection = direction) } },
         )
     }
 }
+
+private fun String.withUppercaseMode(enabled: Boolean): String =
+    if (enabled) uppercase() else this
+
+private fun SlideDirection.layoutDirectionOrNull(): LayoutDirection? =
+    when (isRightToLeft) {
+        true -> LayoutDirection.Rtl
+        false -> LayoutDirection.Ltr
+        null -> null
+    }
 
 @Composable
 fun ModeSection(
@@ -164,6 +201,13 @@ fun RhythmSection(
                 onValueChange = { v -> onUpdate { it.copy(characterDuration = v.toDouble()) } },
             )
             LabeledSlider(
+                title = stringResource(R.string.emoji_duration),
+                value = settings.emojiDuration.toFloat(),
+                valueRange = 0.15f..3.0f,
+                valueText = stringResource(R.string.value_seconds, settings.emojiDuration.toFloat()),
+                onValueChange = { v -> onUpdate { it.copy(emojiDuration = v.toDouble()) } },
+            )
+            LabeledSlider(
                 title = stringResource(R.string.character_gap),
                 value = settings.characterGap.toFloat(),
                 valueRange = 0.0f..1.5f,
@@ -190,6 +234,13 @@ fun SignalSection(
             checked = settings.visualSignalEnabled,
             onCheckedChange = { on -> onUpdate { it.copy(visualSignalEnabled = on) } },
         )
+        if (settings.mode == TransmissionMode.MORSE) {
+            ToggleRow(
+                label = stringResource(R.string.torch_signal),
+                checked = settings.torchSignalEnabled,
+                onCheckedChange = { on -> onUpdate { it.copy(torchSignalEnabled = on) } },
+            )
+        }
         LabeledSlider(
             title = stringResource(R.string.frequency),
             value = settings.signalFrequency.toFloat(),

@@ -8,7 +8,7 @@
     <string name="clear">지우기</string><string name="close">닫기</string><string name="colors">색상</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">편집기 색상</string>
-    <string name="frequency">주파수</string>
+    <string name="emoji_duration">이모지 표시 시간</string><string name="frequency">주파수</string>
     <string name="grant_permission">권한 허용</string><string name="high_frame_rate">고속 프레임</string><string name="international">International</string>
     <string name="manual_exposure_hint">짧은 준비 후 고정 노출(자동 AE 없음)</string><string name="message">메시지</string>
     <string name="mode">모드</string>

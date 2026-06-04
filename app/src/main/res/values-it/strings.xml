@@ -8,7 +8,7 @@
     <string name="clear">Cancella</string><string name="close">Chiudi</string><string name="colors">Colori</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Colori editor</string>
-    <string name="frequency">Frequenza</string>
+    <string name="emoji_duration">Durata emoji</string><string name="frequency">Frequenza</string>
     <string name="grant_permission">Concedi autorizzazione</string><string name="high_frame_rate">Alta frequenza fotogrammi</string><string name="international">International</string>
     <string name="manual_exposure_hint">Esposizione fissa dopo breve riscaldamento (niente AE automatico)</string><string name="message">Messaggio</string>
     <string name="mode">Modalità</string>

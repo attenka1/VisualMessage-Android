@@ -8,7 +8,7 @@
     <string name="clear">مسح</string><string name="close">إغلاق</string><string name="colors">الألوان</string>
     <string name="continental">قاري</string>
     <string name="editor_colors">ألوان المحرر</string>
-    <string name="frequency">التردد</string>
+    <string name="emoji_duration">مدة الرموز التعبيرية</string><string name="frequency">التردد</string>
     <string name="grant_permission">منح الإذن</string><string name="high_frame_rate">معدل إطارات مرتفع</string><string name="international">دولي</string>
     <string name="manual_exposure_hint">تعريض ثابت بعد إحماء قصير (بدون AE تلقائي)</string><string name="message">رسالة</string>
     <string name="mode">الوضع</string>

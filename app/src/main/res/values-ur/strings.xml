@@ -8,7 +8,7 @@
     <string name="clear">صاف کریں</string><string name="close">بند کریں</string><string name="colors">رنگ</string>
     <string name="continental">کانٹیننٹل</string>
     <string name="editor_colors">ایڈیٹر کے رنگ</string>
-    <string name="frequency">تعدد</string>
+    <string name="emoji_duration">ایموجی کا دورانیہ</string><string name="frequency">تعدد</string>
     <string name="grant_permission">اجازت دیں</string><string name="high_frame_rate">زیادہ فریم ریٹ</string><string name="international">بین الاقوامی</string>
     <string name="manual_exposure_hint">مختصر وارم اپ کے بعد مقررہ ایکسپوجر (آٹو AE نہیں)</string><string name="message">پیغام</string>
     <string name="mode">موڈ</string>

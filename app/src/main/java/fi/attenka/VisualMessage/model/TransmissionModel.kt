@@ -13,7 +13,11 @@ enum class TransitionStyle(val titleKey: String) {
     INSTANT("Instant"),
     FADE("Fade"),
     SLIDE("Slide"),
+    SLIDE_VERTICAL("Slide vertical"),
     SCALE("Scale");
+
+    val isContinuousSlide: Boolean
+        get() = this == SLIDE || this == SLIDE_VERTICAL
 }
 
 /** Morse code variant. */
@@ -28,9 +32,17 @@ enum class MorseAlphabet(val titleKey: String) {
         }
 }
 
+/** Direction used for slide/text playback, independently of the app UI language. */
+enum class SlideDirection(val titleKey: String, val isRightToLeft: Boolean?) {
+    AUTO("Auto", null),
+    LTR("LTR", false),
+    RTL("RTL", true);
+}
+
 /** A single thing shown on the playback surface for a given duration. */
 sealed interface FrameKind {
     data class Character(val value: String) : FrameKind
+    data class SlideMessage(val characters: List<String>, val index: Int) : FrameKind
     data object MorseSignal : FrameKind
     data object AppLogo : FrameKind
     data object Blank : FrameKind

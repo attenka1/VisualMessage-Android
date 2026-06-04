@@ -8,7 +8,7 @@
     <string name="clear">Hapus</string><string name="close">Tutup</string><string name="colors">Warna</string>
     <string name="continental">Kontinental</string>
     <string name="editor_colors">Warna editor</string>
-    <string name="frequency">Frekuensi</string>
+    <string name="emoji_duration">Durasi emoji</string><string name="frequency">Frekuensi</string>
     <string name="grant_permission">Berikan izin</string><string name="high_frame_rate">Kecepatan bingkai tinggi</string><string name="international">Internasional</string>
     <string name="manual_exposure_hint">Eksposur tetap setelah pemanasan singkat (tanpa AE otomatis)</string><string name="message">Pesan</string>
     <string name="mode">Mode</string>

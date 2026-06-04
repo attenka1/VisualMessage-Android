@@ -1,11 +1,16 @@
 package fi.attenka.VisualMessage.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,14 +31,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import fi.attenka.VisualMessage.BuildConfig
 import fi.attenka.VisualMessage.R
 import fi.attenka.VisualMessage.ads.AdBannerHost
@@ -51,6 +62,38 @@ fun ContentScreen(
     onLibraryChange: (MessageLibrary) -> Unit,
     onOpenReceiver: () -> Unit = {},
 ) {
+    val context = LocalContext.current
+    var pendingTorchSend by remember { mutableStateOf(false) }
+    var showHelp by remember { mutableStateOf(false) }
+    var hasCameraPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
+        )
+    }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        hasCameraPermission = granted
+        val shouldStart = granted && pendingTorchSend
+        pendingTorchSend = false
+        if (shouldStart) {
+            player.start(settings)
+        }
+    }
+    fun send() {
+        val needsCameraPermission = settings.mode == TransmissionMode.MORSE &&
+            settings.torchSignalEnabled &&
+            !hasCameraPermission
+        if (needsCameraPermission) {
+            pendingTorchSend = true
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        } else {
+            pendingTorchSend = false
+            player.start(settings)
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -60,7 +103,8 @@ fun ContentScreen(
             Header(
                 settings = settings,
                 progressText = player.progressText,
-                onSend = { player.start(settings) },
+                onSend = { send() },
+                onOpenHelp = { showHelp = true },
                 onOpenReceiver = onOpenReceiver,
             )
             HorizontalDivider()
@@ -87,6 +131,10 @@ fun ContentScreen(
                 onStop = player::stop,
             )
         }
+
+        if (showHelp) {
+            HelpDialog(onDismiss = { showHelp = false })
+        }
     }
 }
 
@@ -95,12 +143,51 @@ private fun Header(
     settings: TransmissionSettings,
     progressText: String,
     onSend: () -> Unit,
+    onOpenHelp: () -> Unit,
     onOpenReceiver: () -> Unit,
 ) {
-    Row(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        val compact = maxWidth < 520.dp
+
+        if (compact) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                HeaderIdentity(progressText = progressText)
+                HeaderActions(
+                    settings = settings,
+                    onSend = onSend,
+                    onOpenHelp = onOpenHelp,
+                    onOpenReceiver = onOpenReceiver,
+                    modifier = Modifier.align(Alignment.End),
+                )
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                HeaderIdentity(progressText = progressText, modifier = Modifier.weight(1f))
+                HeaderActions(
+                    settings = settings,
+                    onSend = onSend,
+                    onOpenHelp = onOpenHelp,
+                    onOpenReceiver = onOpenReceiver,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeaderIdentity(
+    progressText: String,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -122,6 +209,25 @@ private fun Header(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+    }
+}
+
+@Composable
+private fun HeaderActions(
+    settings: TransmissionSettings,
+    onSend: () -> Unit,
+    onOpenHelp: () -> Unit,
+    onOpenReceiver: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        TextButton(onClick = onOpenHelp) {
+            Text(stringResource(R.string.help))
         }
         TextButton(onClick = onOpenReceiver) {
             Text(stringResource(R.string.receive))

@@ -8,7 +8,7 @@
     <string name="clear">Futa</string><string name="close">Funga</string><string name="colors">Rangi</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Rangi za kihariri</string>
-    <string name="frequency">Masafa</string>
+    <string name="emoji_duration">Muda wa emoji</string><string name="frequency">Masafa</string>
     <string name="grant_permission">Ruhusu</string><string name="high_frame_rate">Kiwango cha juu cha fremu</string><string name="international">International</string>
     <string name="manual_exposure_hint">Mwangaza thabiti baada ya kuongezeka kwa muda mfupi (hakuna AE otomatiki)</string><string name="message">Ujumbe</string>
     <string name="mode">Hali</string>

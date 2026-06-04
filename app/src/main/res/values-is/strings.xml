@@ -8,7 +8,7 @@
     <string name="clear">Hreinsa</string><string name="close">Loka</string><string name="colors">Litir</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Ritstjóralitir</string>
-    <string name="frequency">Tíðni</string>
+    <string name="emoji_duration">Emoji lengd</string><string name="frequency">Tíðni</string>
     <string name="grant_permission">Veita leyfi</string><string name="high_frame_rate">Hátt rammatíðni</string><string name="international">International</string>
     <string name="manual_exposure_hint">Fast lýsing eftir stuttan upphitnun (engin sjálfvirk AE)</string><string name="message">Skilaboð</string>
     <string name="mode">Hamur</string>

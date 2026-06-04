@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import fi.attenka.VisualMessage.R
 import fi.attenka.VisualMessage.model.FrameKind
 import fi.attenka.VisualMessage.model.TransmissionFrame
+import fi.attenka.VisualMessage.model.TransmissionMode
 import fi.attenka.VisualMessage.model.TransmissionSequenceBuilder
 import fi.attenka.VisualMessage.model.TransmissionSettings
 import kotlinx.coroutines.Job
@@ -35,6 +36,7 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
         private set
 
     private val tonePlayer = TonePlayer()
+    private val flashlightController = FlashlightController(application)
     private var playbackJob: Job? = null
 
     fun start(settings: TransmissionSettings) {
@@ -46,24 +48,31 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
         isPlaying = true
 
         playbackJob = viewModelScope.launch {
-            // Give the user time to turn the phone before anything is shown or heard.
-            for (seconds in settings.startDelaySeconds downTo 1) {
-                if (!isActive) return@launch
-                progressText = seconds.toString()
-                delay(1000)
-            }
+            try {
+                flashlightController.turnOff()
 
-            progressText = getApplication<Application>().getString(R.string.sending)
+                // Give the user time to turn the phone before anything is shown or heard.
+                for (seconds in settings.startDelaySeconds downTo 1) {
+                    if (!isActive) return@launch
+                    progressText = seconds.toString()
+                    delay(1000)
+                }
 
-            if (settings.soundSignalEnabled) {
-                tonePlayer.playSignal(settings.signalFrequency)
-            }
+                progressText = getApplication<Application>().getString(R.string.sending)
 
-            frames.forEachIndexed { index, frame ->
-                if (!isActive) return@launch
-                currentFrame = frame
-                progressText = "${index + 1} / ${frames.size}"
-                delay((frame.durationSeconds * 1000).toLong())
+                if (settings.soundSignalEnabled) {
+                    tonePlayer.playSignal(settings.signalFrequency)
+                }
+
+                frames.forEachIndexed { index, frame ->
+                    if (!isActive) return@launch
+                    currentFrame = frame
+                    flashlightController.setEnabled(frame.shouldUseTorch(settings))
+                    progressText = "${index + 1} / ${frames.size}"
+                    delay((frame.durationSeconds * 1000).toLong())
+                }
+            } finally {
+                flashlightController.turnOff()
             }
             finish()
         }
@@ -73,6 +82,7 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
         playbackJob?.cancel()
         playbackJob = null
         tonePlayer.stop()
+        flashlightController.turnOff()
         finish()
     }
 
@@ -85,5 +95,11 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
     override fun onCleared() {
         super.onCleared()
         tonePlayer.stop()
+        flashlightController.turnOff()
     }
+
+    private fun TransmissionFrame.shouldUseTorch(settings: TransmissionSettings): Boolean =
+        settings.mode == TransmissionMode.MORSE &&
+            settings.torchSignalEnabled &&
+            kind == FrameKind.MorseSignal
 }

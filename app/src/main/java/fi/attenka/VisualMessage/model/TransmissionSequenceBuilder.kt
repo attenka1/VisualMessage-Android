@@ -53,12 +53,15 @@ object TransmissionSequenceBuilder {
         // Iterate by grapheme clusters (matching Swift's Array(String)) so multi-code-unit
         // characters such as emoji stay whole instead of being split into broken surrogates.
         val characters = message.graphemeClusters()
+        if (settings.transitionStyle.isContinuousSlide) {
+            return slideFrames(characters, settings)
+        }
 
         characters.forEachIndexed { index, character ->
             if (character.isBlank()) {
                 frames += TransmissionFrame(FrameKind.Blank, settings.characterDuration * 2)
             } else {
-                frames += TransmissionFrame(FrameKind.Character(character), settings.characterDuration)
+                frames += TransmissionFrame(FrameKind.Character(character), characterDuration(character, settings))
             }
 
             if (index < characters.size - 1) {
@@ -68,6 +71,24 @@ object TransmissionSequenceBuilder {
 
         return frames
     }
+
+    private fun slideFrames(characters: List<String>, settings: TransmissionSettings): List<TransmissionFrame> =
+        listOf(
+            TransmissionFrame(
+                FrameKind.SlideMessage(characters, 0),
+                characters.sumOf { character -> characterDuration(character, settings) } + slideLeadingPaddingDuration(settings),
+            ),
+        )
+
+    private fun slideLeadingPaddingDuration(settings: TransmissionSettings): Double =
+        settings.characterDuration * 30
+
+    private fun characterDuration(character: String, settings: TransmissionSettings): Double =
+        when {
+            character.isBlank() -> settings.characterDuration * 2
+            character.isEmojiGrapheme() -> settings.emojiDuration
+            else -> settings.characterDuration
+        }
 
     /** Splits a string into user-perceived characters (extended grapheme clusters). */
     private fun String.graphemeClusters(): List<String> {
@@ -82,6 +103,27 @@ object TransmissionSequenceBuilder {
             end = iterator.next()
         }
         return clusters
+    }
+
+    private fun String.isEmojiGrapheme(): Boolean {
+        if (isBlank()) return false
+        var index = 0
+        while (index < length) {
+            val codePoint = codePointAt(index)
+            if (isEmojiCodePoint(codePoint)) return true
+            index += Character.charCount(codePoint)
+        }
+        return false
+    }
+
+    private fun isEmojiCodePoint(codePoint: Int): Boolean = when (codePoint) {
+        in 0x1F300..0x1FAFF,
+        in 0x1F600..0x1F64F,
+        in 0x2600..0x27BF,
+        in 0x1F900..0x1F9FF,
+        in 0x1F1E6..0x1F1FF,
+        -> true
+        else -> false
     }
 
     private fun morseFrames(message: String, settings: TransmissionSettings): List<TransmissionFrame> {

@@ -8,7 +8,7 @@
     <string name="clear">Очистити</string><string name="close">Закрити</string><string name="colors">Кольори</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Кольори редактора</string>
-    <string name="frequency">Частота</string>
+    <string name="emoji_duration">Тривалість емодзі</string><string name="frequency">Частота</string>
     <string name="grant_permission">Надати дозвіл</string><string name="high_frame_rate">Висока частота кадрів</string><string name="international">International</string>
     <string name="manual_exposure_hint">Фіксована експозиція після короткого розігріву (без авто AE)</string><string name="message">Повідомлення</string>
     <string name="mode">Режим</string>

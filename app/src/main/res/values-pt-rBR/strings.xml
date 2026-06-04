@@ -8,7 +8,7 @@
     <string name="clear">Limpar</string><string name="close">Fechar</string><string name="colors">Cores</string>
     <string name="continental">Continental</string>
     <string name="editor_colors">Cores do editor</string>
-    <string name="frequency">Frequência</string>
+    <string name="emoji_duration">Duração do emoji</string><string name="frequency">Frequência</string>
     <string name="grant_permission">Conceder permissão</string><string name="high_frame_rate">Alta taxa de quadros</string><string name="international">Internacional</string>
     <string name="manual_exposure_hint">Exposição fixa após breve aquecimento (sem AE automático)</string><string name="message">Mensagem</string>
     <string name="mode">Modo</string>

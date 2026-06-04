@@ -6,8 +6,21 @@
     <string name="ready">Ready</string>
     <string name="sending">Sending\u2026</string>
     <string name="stop">Stop</string>
+    <string name="help">Help</string>
+    <string name="help_title">Help</string>
+    <string name="help_summary">Write a message, choose Visual or Morse, then send. Visual shows the message on screen; Morse plays code with light and optional sound.</string>
+    <string name="help_visual_title">Visual mode</string>
+    <string name="help_visual_body">Use transitions for screen text. Slide direction controls LTR/RTL movement; Slide vertical stacks letters by word.</string>
+    <string name="help_morse_title">Morse mode</string>
+    <string name="help_morse_body">International is the standard alphabet. Continental uses International plus the extra letters shown below.</string>
+    <string name="help_continental_note">Same as International, plus:</string>
 
     <string name="message">Message</string>
+    <string name="uppercase_mode">Uppercase</string>
+    <string name="slide_direction">Slide direction</string>
+    <string name="slide_direction_auto">Auto</string>
+    <string name="slide_direction_ltr">LTR</string>
+    <string name="slide_direction_rtl">RTL</string>
 
     <string name="mode">Mode</string>
     <string name="mode_visual">Visual</string>
@@ -17,6 +30,7 @@
     <string name="transition_instant">Instant</string>
     <string name="transition_fade">Fade</string>
     <string name="transition_slide">Slide</string>
+    <string name="transition_slide_vertical">Slide vertical</string>
     <string name="transition_scale">Scale</string>
 
     <string name="morse_settings">Morse settings</string>
@@ -29,11 +43,13 @@
     <string name="repeats">Repeats</string>
     <string name="start_delay">Start delay</string>
     <string name="character_duration">Character duration</string>
+    <string name="emoji_duration">Emoji duration</string>
     <string name="character_gap">Character gap</string>
 
     <string name="attention_signal">Attention signal</string>
     <string name="sound">Sound</string>
     <string name="start_flash">Start flash</string>
+    <string name="torch_signal">Use flashlight for Morse</string>
     <string name="frequency">Frequency</string>
 
     <string name="colors">Colors</string>

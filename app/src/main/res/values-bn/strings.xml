@@ -8,7 +8,7 @@
     <string name="clear">মুছুন</string><string name="close">বন্ধ</string><string name="colors">রং</string>
     <string name="continental">কন্টিনেন্টাল</string>
     <string name="editor_colors">এডিটরের রং</string>
-    <string name="frequency">কম্পাঙ্ক</string>
+    <string name="emoji_duration">ইমোজির সময়কাল</string><string name="frequency">কম্পাঙ্ক</string>
     <string name="grant_permission">অনুমতি দিন</string><string name="high_frame_rate">উচ্চ ফ্রেম রেট</string><string name="international">আন্তর্জাতিক</string>
     <string name="manual_exposure_hint">সংক্ষিপ্ত ওয়ার্মআপের পর স্থির এক্সপোজার (অটো AE নেই)</string><string name="message">বার্তা</string>
     <string name="mode">মোড</string>

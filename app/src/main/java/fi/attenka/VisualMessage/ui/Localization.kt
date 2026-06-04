@@ -16,9 +16,13 @@ fun resourceForKey(key: String): Int = when (key) {
     "Instant" -> R.string.transition_instant
     "Fade" -> R.string.transition_fade
     "Slide" -> R.string.transition_slide
+    "Slide vertical" -> R.string.transition_slide_vertical
     "Scale" -> R.string.transition_scale
     "International" -> R.string.international
     "Continental" -> R.string.continental
+    "Auto" -> R.string.slide_direction_auto
+    "LTR" -> R.string.slide_direction_ltr
+    "RTL" -> R.string.slide_direction_rtl
     "Black / white" -> R.string.theme_black_white
     "White / black" -> R.string.theme_white_black
     "Black / orange" -> R.string.theme_black_orange

@@ -8,7 +8,7 @@
     <string name="clear">Очистить</string><string name="close">Закрыть</string><string name="colors">Цвета</string>
     <string name="continental">Континентальный</string>
     <string name="editor_colors">Цвета редактора</string>
-    <string name="frequency">Частота</string>
+    <string name="emoji_duration">Длительность эмодзи</string><string name="frequency">Частота</string>
     <string name="grant_permission">Предоставить разрешение</string><string name="high_frame_rate">Высокая частота кадров</string><string name="international">Международный</string>
     <string name="manual_exposure_hint">Фиксированная экспозиция после короткой подготовки (без авто AE)</string><string name="message">Сообщение</string>
     <string name="mode">Режим</string>
