@@ -24,12 +24,16 @@ data class TransmissionSettings(
     val transitionStyle: TransitionStyle = TransitionStyle.FADE,
     val soundSignalEnabled: Boolean = true,
     val visualSignalEnabled: Boolean = true,
-    val torchSignalEnabled: Boolean = false,
+    val morseSoundEnabled: Boolean = false,
+    val morseOutputMode: MorseOutputMode = MorseOutputMode.SCREEN,
     val signalFrequency: Double = 880.0,
     val startDelaySeconds: Int = 2,
     val morseUnitDuration: Double = 0.24, // 5 WPM (unit = 1.2 / WPM)
     val morseAlphabet: MorseAlphabet = MorseAlphabet.INTERNATIONAL,
 ) {
+    val torchSignalEnabled: Boolean
+        get() = morseOutputMode.usesTorch
+
     val activeTheme: ColorTheme
         get() {
             if (themeID == "custom") {

@@ -11,11 +11,11 @@
     <string name="emoji_duration">Emojin kesto</string><string name="frequency">Taajuus</string>
     <string name="grant_permission">Myönnä lupa</string><string name="help">Ohje</string>
     <string name="help_title">Ohje</string>
-    <string name="help_summary">Kirjoita viesti, valitse Graafinen tai Morse ja lähetä. Graafinen näyttää viestin ruudulla; Morse lähettää koodia valolla ja halutessa äänellä.</string>
+    <string name="help_summary">Kirjoita viesti, valitse Graafinen tai Morse ja lähetä. Graafinen näyttää viestin ruudulla; Morse lähettää koodia näytön välähdyksillä, taskulampulla, valinnaisilla piippauksilla tai valitsemallasi yhdistelmällä.</string>
     <string name="help_visual_title">Graafinen tila</string>
     <string name="help_visual_body">Valitse tekstin siirtymä. Slide-suunta ohjaa LTR/RTL-liikettä; Slide pysty pinoaa sanan kirjaimet allekkain.</string>
     <string name="help_morse_title">Morse-tila</string>
-    <string name="help_morse_body">International on tavallinen morseaakkosto. Continental käyttää International-aakkostoa ja lisää alla näkyvät merkit.</string>
+    <string name="help_morse_body">Morse-ulostulo valitsee näytön, taskulampun tai molemmat. Morse-piippaus soittaa valitun taajuuden jokaisen merkin aikana. Lähetettävä kirjain näkyy oikeassa alakulmassa lähetyksen ajan. International on tavallinen morseaakkosto; Continental lisää alla näkyvät merkit.</string>
     <string name="help_continental_note">Sama kuin International, lisäksi:</string>
     <string name="high_frame_rate">Korkea kuvanopeus</string>
     <string name="international">International</string>
@@ -29,6 +29,11 @@
     <string name="mode">Tila</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Graafinen</string>
+    <string name="morse_beep">Morse-piippaus</string>
+    <string name="morse_output">Morse-ulostulo</string>
+    <string name="morse_output_screen">Näyttö</string>
+    <string name="morse_output_torch">Taskulamppu</string>
+    <string name="morse_output_both">Molemmat</string>
     <string name="morse_settings">Morse-asetukset</string>
     <string name="no_saved_messages">Ei tallennettuja viestejä</string>
     <string name="point_camera">Osoita kameraa vilkkuvaan valoon</string><string name="preset">Esiasetus</string>

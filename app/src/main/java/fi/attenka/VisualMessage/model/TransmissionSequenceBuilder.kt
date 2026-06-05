@@ -137,12 +137,13 @@ object TransmissionSequenceBuilder {
             letters.forEachIndexed { letterIndex, letter ->
                 val code = settings.morseAlphabet.codes[letter] ?: return@forEachIndexed
                 val signals = code.toList()
+                val displayedLetter = letter.lowercaseChar().toString()
 
                 signals.forEachIndexed { signalIndex, signal ->
-                    frames += TransmissionFrame(FrameKind.MorseSignal, unit * (if (signal == '-') 3.0 else 1.0))
+                    frames += TransmissionFrame(FrameKind.MorseSignal(displayedLetter), unit * (if (signal == '-') 3.0 else 1.0))
 
                     if (signalIndex < signals.size - 1) {
-                        frames += TransmissionFrame(FrameKind.Blank, unit)
+                        frames += TransmissionFrame(FrameKind.MorseLetterGap(displayedLetter), unit)
                     }
                 }
 

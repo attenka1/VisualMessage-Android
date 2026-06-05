@@ -32,6 +32,19 @@ enum class MorseAlphabet(val titleKey: String) {
         }
 }
 
+/** Where Morse marks are emitted during playback. */
+enum class MorseOutputMode(val titleKey: String) {
+    SCREEN("Screen"),
+    TORCH("Torch"),
+    SCREEN_AND_TORCH("Both");
+
+    val usesScreen: Boolean
+        get() = this != TORCH
+
+    val usesTorch: Boolean
+        get() = this != SCREEN
+}
+
 /** Direction used for slide/text playback, independently of the app UI language. */
 enum class SlideDirection(val titleKey: String, val isRightToLeft: Boolean?) {
     AUTO("Auto", null),
@@ -43,7 +56,8 @@ enum class SlideDirection(val titleKey: String, val isRightToLeft: Boolean?) {
 sealed interface FrameKind {
     data class Character(val value: String) : FrameKind
     data class SlideMessage(val characters: List<String>, val index: Int) : FrameKind
-    data object MorseSignal : FrameKind
+    data class MorseSignal(val letter: String) : FrameKind
+    data class MorseLetterGap(val letter: String) : FrameKind
     data object AppLogo : FrameKind
     data object Blank : FrameKind
 }

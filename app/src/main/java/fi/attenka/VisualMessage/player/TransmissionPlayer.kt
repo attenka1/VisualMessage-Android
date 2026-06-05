@@ -67,12 +67,20 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
                 frames.forEachIndexed { index, frame ->
                     if (!isActive) return@launch
                     currentFrame = frame
+                    val isMorseSignal = frame.kind is FrameKind.MorseSignal
                     flashlightController.setEnabled(frame.shouldUseTorch(settings))
+                    tonePlayer.setContinuousToneEnabled(
+                        enabled = settings.mode == TransmissionMode.MORSE &&
+                            settings.morseSoundEnabled &&
+                            isMorseSignal,
+                        frequency = settings.signalFrequency,
+                    )
                     progressText = "${index + 1} / ${frames.size}"
                     delay((frame.durationSeconds * 1000).toLong())
                 }
             } finally {
                 flashlightController.turnOff()
+                tonePlayer.setContinuousToneEnabled(false)
             }
             finish()
         }
@@ -81,6 +89,7 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
     fun stop() {
         playbackJob?.cancel()
         playbackJob = null
+        tonePlayer.setContinuousToneEnabled(false)
         tonePlayer.stop()
         flashlightController.turnOff()
         finish()
@@ -100,6 +109,6 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
 
     private fun TransmissionFrame.shouldUseTorch(settings: TransmissionSettings): Boolean =
         settings.mode == TransmissionMode.MORSE &&
-            settings.torchSignalEnabled &&
-            kind == FrameKind.MorseSignal
+            settings.morseOutputMode.usesTorch &&
+            kind is FrameKind.MorseSignal
 }

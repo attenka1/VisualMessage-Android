@@ -105,6 +105,19 @@ fun PlaybackSurface(
                 Text(stringResource(R.string.stop))
             }
         }
+
+        morseLetter(frame)?.let { letter ->
+            Text(
+                text = letter.uppercase(),
+                color = Color.Red,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(18.dp)
+                    .background(Color.White.copy(alpha = 0.82f), RoundedCornerShape(50))
+                    .padding(horizontal = 18.dp, vertical = 14.dp),
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+            )
+        }
         }
     }
 }
@@ -140,7 +153,15 @@ private fun FrameContent(frame: TransmissionFrame, settings: TransmissionSetting
             )
         }
 
-        FrameKind.MorseSignal -> Box(Modifier.fillMaxSize().background(Color.White))
+        is FrameKind.MorseSignal -> {
+            if (settings.morseOutputMode.usesScreen) {
+                Box(Modifier.fillMaxSize().background(Color.White))
+            } else {
+                Box(Modifier.fillMaxSize())
+            }
+        }
+
+        is FrameKind.MorseLetterGap -> Box(Modifier.fillMaxSize())
 
         FrameKind.Blank -> Box(Modifier.fillMaxSize())
     }
@@ -247,12 +268,20 @@ private fun verticalSlideText(characters: List<String>): String {
 
 private fun backgroundColor(frame: TransmissionFrame, settings: TransmissionSettings): Color =
     when (frame.kind) {
-        FrameKind.MorseSignal -> Color.White
+        is FrameKind.MorseSignal -> if (settings.morseOutputMode.usesScreen) Color.White else Color.Black
+        is FrameKind.MorseLetterGap -> Color.Black
         FrameKind.AppLogo -> Color.Black
         FrameKind.Blank -> if (settings.mode == TransmissionMode.MORSE) Color.Black else settings.activeTheme.background
         is FrameKind.Character,
         is FrameKind.SlideMessage,
         -> settings.activeTheme.background
+    }
+
+private fun morseLetter(frame: TransmissionFrame): String? =
+    when (val kind = frame.kind) {
+        is FrameKind.MorseSignal -> kind.letter
+        is FrameKind.MorseLetterGap -> kind.letter
+        else -> null
     }
 
 private fun transitionFor(style: TransitionStyle, layoutDirection: LayoutDirection) = when (style) {

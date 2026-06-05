@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.ui.graphics.Color
 import fi.attenka.VisualMessage.model.MessageLibrary
 import fi.attenka.VisualMessage.model.MorseAlphabet
+import fi.attenka.VisualMessage.model.MorseOutputMode
 import fi.attenka.VisualMessage.model.SlideDirection
 import fi.attenka.VisualMessage.model.TransmissionMode
 import fi.attenka.VisualMessage.model.TransmissionSettings
@@ -58,7 +59,9 @@ class SettingsRepository(context: Context) {
         put("transitionStyle", s.transitionStyle.name)
         put("soundSignalEnabled", s.soundSignalEnabled)
         put("visualSignalEnabled", s.visualSignalEnabled)
-        put("torchSignalEnabled", s.torchSignalEnabled)
+        put("morseSoundEnabled", s.morseSoundEnabled)
+        put("torchSignalEnabled", s.morseOutputMode.usesTorch)
+        put("morseOutputMode", s.morseOutputMode.name)
         put("signalFrequency", s.signalFrequency)
         put("startDelaySeconds", s.startDelaySeconds)
         put("morseUnitDuration", s.morseUnitDuration)
@@ -71,6 +74,10 @@ class SettingsRepository(context: Context) {
 
     private fun decodeSettings(json: JSONObject): TransmissionSettings {
         val defaults = TransmissionSettings()
+        val legacyTorchEnabled = json.optBoolean("torchSignalEnabled", defaults.torchSignalEnabled)
+        val outputMode = json.optEnumOrNull<MorseOutputMode>("morseOutputMode")
+            ?: if (legacyTorchEnabled) MorseOutputMode.SCREEN_AND_TORCH else defaults.morseOutputMode
+
         return defaults.copy(
             message = json.optString("message", defaults.message),
             mode = json.optEnum("mode", defaults.mode),
@@ -85,7 +92,8 @@ class SettingsRepository(context: Context) {
             transitionStyle = json.optEnum("transitionStyle", defaults.transitionStyle),
             soundSignalEnabled = json.optBoolean("soundSignalEnabled", defaults.soundSignalEnabled),
             visualSignalEnabled = json.optBoolean("visualSignalEnabled", defaults.visualSignalEnabled),
-            torchSignalEnabled = json.optBoolean("torchSignalEnabled", defaults.torchSignalEnabled),
+            morseSoundEnabled = json.optBoolean("morseSoundEnabled", defaults.morseSoundEnabled),
+            morseOutputMode = outputMode,
             signalFrequency = json.optDouble("signalFrequency", defaults.signalFrequency),
             startDelaySeconds = json.optInt("startDelaySeconds", defaults.startDelaySeconds).coerceIn(1, 10),
             morseUnitDuration = json.optDouble("morseUnitDuration", defaults.morseUnitDuration),
@@ -122,6 +130,15 @@ class SettingsRepository(context: Context) {
     private inline fun <reified T : Enum<T>> JSONObject.optEnum(key: String, fallback: T): T {
         val name = optString(key, fallback.name)
         return runCatching { enumValueOf<T>(name) }.getOrDefault(fallback)
+    }
+
+    private inline fun <reified T : Enum<T>> JSONObject.optEnumOrNull(key: String): T? {
+        val name = optString(key, "")
+        return runCatching { enumValueOf<T>(name) }.getOrNull()
+            ?: enumValues<T>().firstOrNull { value ->
+                value.name.equals(name, ignoreCase = true) ||
+                    value.name.replace("_", "").equals(name, ignoreCase = true)
+            }
     }
 
     private fun JSONObject.optSlideDirection(fallback: SlideDirection): SlideDirection {

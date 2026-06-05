@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import fi.attenka.VisualMessage.R
 import fi.attenka.VisualMessage.model.MessageLibrary
 import fi.attenka.VisualMessage.model.MorseAlphabet
+import fi.attenka.VisualMessage.model.MorseOutputMode
 import fi.attenka.VisualMessage.model.SlideDirection
 import fi.attenka.VisualMessage.model.TransitionStyle
 import fi.attenka.VisualMessage.model.TransmissionMode
@@ -236,9 +237,16 @@ fun SignalSection(
         )
         if (settings.mode == TransmissionMode.MORSE) {
             ToggleRow(
-                label = stringResource(R.string.torch_signal),
-                checked = settings.torchSignalEnabled,
-                onCheckedChange = { on -> onUpdate { it.copy(torchSignalEnabled = on) } },
+                label = stringResource(R.string.morse_beep),
+                checked = settings.morseSoundEnabled,
+                onCheckedChange = { on -> onUpdate { it.copy(morseSoundEnabled = on) } },
+            )
+            Text(stringResource(R.string.morse_output), style = MaterialTheme.typography.labelLarge)
+            EnumSegmented(
+                options = MorseOutputMode.entries,
+                selected = settings.morseOutputMode,
+                labelKey = { it.titleKey },
+                onSelect = { outputMode -> onUpdate { it.copy(morseOutputMode = outputMode) } },
             )
         }
         LabeledSlider(

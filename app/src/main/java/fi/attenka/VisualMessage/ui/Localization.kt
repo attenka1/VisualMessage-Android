@@ -20,6 +20,9 @@ fun resourceForKey(key: String): Int = when (key) {
     "Scale" -> R.string.transition_scale
     "International" -> R.string.international
     "Continental" -> R.string.continental
+    "Screen" -> R.string.morse_output_screen
+    "Torch" -> R.string.morse_output_torch
+    "Both" -> R.string.morse_output_both
     "Auto" -> R.string.slide_direction_auto
     "LTR" -> R.string.slide_direction_ltr
     "RTL" -> R.string.slide_direction_rtl

@@ -85,4 +85,28 @@ class TransmissionSequenceBuilderTest {
         )
         assertEquals(18.0, frames.single().durationSeconds, 0.000_001)
     }
+
+    @Test
+    fun morseFramesCarryDisplayedLetter() {
+        val settings = TransmissionSettings(
+            message = "A",
+            mode = TransmissionMode.MORSE,
+            morseUnitDuration = 0.2,
+        )
+
+        val frames = TransmissionSequenceBuilder.frames(settings)
+
+        assertEquals(
+            listOf(
+                FrameKind.MorseSignal("a"),
+                FrameKind.MorseLetterGap("a"),
+                FrameKind.MorseSignal("a"),
+                FrameKind.Blank,
+            ),
+            frames.map { it.kind },
+        )
+        assertEquals(0.2, frames[0].durationSeconds, 0.000_001)
+        assertEquals(0.2, frames[1].durationSeconds, 0.000_001)
+        assertEquals(0.6, frames[2].durationSeconds, 0.000_001)
+    }
 }
