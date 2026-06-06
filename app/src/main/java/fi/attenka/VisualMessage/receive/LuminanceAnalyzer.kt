@@ -2,6 +2,7 @@ package fi.attenka.VisualMessage.receive
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import kotlin.math.ceil
 import kotlin.math.max
 
 /**
@@ -26,7 +27,7 @@ class LuminanceAnalyzer(
             val startX = (width - roiW) / 2
             val startY = (height - roiH) / 2
 
-            var sum = 0L
+            val histogram = IntArray(LUMINANCE_BUCKETS)
             var count = 0
             var y = startY
             while (y < startY + roiH) {
@@ -35,7 +36,7 @@ class LuminanceAnalyzer(
                 while (x < startX + roiW) {
                     val index = rowBase + x * pixelStride
                     if (index in 0 until buffer.limit()) {
-                        sum += (buffer.get(index).toInt() and 0xFF)
+                        histogram[buffer.get(index).toInt() and 0xFF]++
                         count++
                     }
                     x += STEP
@@ -43,16 +44,36 @@ class LuminanceAnalyzer(
                 y += STEP
             }
 
-            val level = if (count > 0) sum.toDouble() / count else 0.0
+            val level = if (count > 0) brightestAverage(histogram, count) else 0.0
             onSample(level, image.imageInfo.timestamp / 1_000_000L)
         } finally {
             image.close()
         }
     }
 
+    private fun brightestAverage(histogram: IntArray, sampleCount: Int): Double {
+        var remaining = max(MIN_BRIGHT_SAMPLES, ceil(sampleCount * BRIGHT_FRACTION).toInt())
+            .coerceAtMost(sampleCount)
+        var sum = 0L
+        var used = 0
+        for (level in histogram.indices.reversed()) {
+            val take = minOf(histogram[level], remaining)
+            if (take > 0) {
+                sum += level.toLong() * take
+                used += take
+                remaining -= take
+                if (remaining == 0) break
+            }
+        }
+        return if (used > 0) sum.toDouble() / used else 0.0
+    }
+
     companion object {
         /** Fraction of the frame width/height analysed (and shown as the aim box). */
         const val ROI_FRACTION = 0.4f
+        private const val LUMINANCE_BUCKETS = 256
+        private const val BRIGHT_FRACTION = 0.01
+        private const val MIN_BRIGHT_SAMPLES = 8
         private val STEP = max(1, 4)
     }
 }

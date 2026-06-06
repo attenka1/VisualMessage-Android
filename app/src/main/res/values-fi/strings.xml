@@ -15,17 +15,27 @@
     <string name="help_visual_title">Graafinen tila</string>
     <string name="help_visual_body">Valitse tekstin siirtymä. Slide-suunta ohjaa LTR/RTL-liikettä; Slide pysty pinoaa sanan kirjaimet allekkain.</string>
     <string name="help_morse_title">Morse-tila</string>
-    <string name="help_morse_body">Morse-ulostulo valitsee näytön, taskulampun tai molemmat. Morse-piippaus soittaa valitun taajuuden jokaisen merkin aikana. Lähetettävä kirjain näkyy oikeassa alakulmassa lähetyksen ajan. International on tavallinen morseaakkosto; Continental lisää alla näkyvät merkit.</string>
+    <string name="help_morse_body">Morse-ulostulo valitsee näytön, taskulampun tai molemmat. Morse-piippaus soittaa valitun taajuuden jokaisen merkin aikana. Lähetettävä kirjain näkyy oikeassa alakulmassa lähetyksen ajan. Vastaanotin toimii parhaiten, kun vilkkuva valo on tähtäysruudun keskellä; kaukaiset pienet valot havaitaan nyt aiempaa luotettavammin. International on tavallinen morseaakkosto; Continental lisää alla näkyvät merkit.</string>
     <string name="help_continental_note">Sama kuin International, lisäksi:</string>
     <string name="high_frame_rate">Korkea kuvanopeus</string>
     <string name="international">International</string>
     <string name="manual_exposure_hint">Kiinteä valotus lyhyen alustuksen jälkeen (ei automaattia)</string>
 <string name="message">Viesti</string>
+    <string name="insert_image">Kuva</string>
+    <string name="image">Kuva</string>
+    <string name="image_insert_position">Merkin %1$d jälkeen</string>
+    <string name="remove">Poista</string>
+    <string name="selected_text_color">Valitun tekstin väri</string>
+    <string name="apply_text_color">Väritä valinta</string>
+    <string name="clear_text_color">Poista valinnan väri</string>
     <string name="uppercase_mode">Isot kirjaimet</string>
     <string name="slide_direction">Slide-suunta</string>
     <string name="slide_direction_auto">Auto</string>
     <string name="slide_direction_ltr">LTR</string>
     <string name="slide_direction_rtl">RTL</string>
+    <string name="slide_image_behavior">Kuvan liukuminen</string>
+    <string name="slide_image_static_between_text">Staattinen tekstin välissä</string>
+    <string name="slide_image_slide_with_text">Liuku tekstin mukana</string>
     <string name="mode">Tila</string>
     <string name="mode_morse">Morse</string>
     <string name="mode_visual">Graafinen</string>
@@ -40,6 +50,7 @@
     <string name="ready">Valmis</string>
     <string name="receive">Vastaanota</string><string name="receiver_title">Morse-vastaanotin</string><string name="remove_from_saved">Poista tallennetuista</string>
     <string name="repeats">Toistot</string>
+    <string name="repeat_forever">Toista pysäytykseen asti</string>
     <string name="rhythm">Rhythm</string><string name="save_message">Tallenna viesti</string>
     <string name="saved_messages">Tallennetut viestit</string>
     <string name="send">Lähetä</string>
@@ -54,6 +65,17 @@
     <string name="theme_black_orange">Musta / oranssi</string>
     <string name="theme_black_white">Musta / valkoinen</string>
     <string name="theme_custom">Oma valinta</string>
+    <string name="multicolor_letters">Moniväriset kirjaimet</string>
+    <string name="font">Fontti</string>
+    <string name="font_default">Oletus</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_monospace">Monospace</string>
+    <string name="font_style">Tyyli</string>
+    <string name="font_style_regular">Regular</string>
+    <string name="font_style_italic">Italic</string>
+    <string name="font_style_bold">Bold</string>
+    <string name="font_style_bold_italic">Bold italic</string>
     <string name="theme_orange_black">Oranssi / musta</string>
     <string name="theme_white_black">Valkoinen / musta</string>
     <string name="theme_yellow_black">Keltainen / musta</string>
