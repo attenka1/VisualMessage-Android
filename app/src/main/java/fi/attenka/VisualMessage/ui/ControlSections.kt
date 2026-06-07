@@ -1,37 +1,59 @@
 package fi.attenka.VisualMessage.ui
 
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import fi.attenka.VisualMessage.R
+import fi.attenka.VisualMessage.model.MessageFontFamily
+import fi.attenka.VisualMessage.model.MessageFontStyle
+import fi.attenka.VisualMessage.model.MessageImage
 import fi.attenka.VisualMessage.model.MessageLibrary
+import fi.attenka.VisualMessage.model.MessageTextColorSpan
 import fi.attenka.VisualMessage.model.MorseAlphabet
 import fi.attenka.VisualMessage.model.MorseOutputMode
 import fi.attenka.VisualMessage.model.SlideDirection
+import fi.attenka.VisualMessage.model.SlideImageBehavior
 import fi.attenka.VisualMessage.model.TransitionStyle
 import fi.attenka.VisualMessage.model.TransmissionMode
 import fi.attenka.VisualMessage.model.TransmissionSettings
@@ -43,7 +65,20 @@ fun MessageSection(
     library: MessageLibrary,
     onUpdate: ((TransmissionSettings) -> TransmissionSettings) -> Unit,
     onLibraryChange: (MessageLibrary) -> Unit,
+    onPickImage: (Int) -> Unit,
+    onRemoveImage: (String) -> Unit,
 ) {
+    var editorValue by remember { mutableStateOf(TextFieldValue(settings.message)) }
+    var selectedTextColor by remember { mutableStateOf(Color(0xFFFF3B30)) }
+    LaunchedEffect(settings.message) {
+        if (settings.message != editorValue.text) {
+            editorValue = TextFieldValue(
+                text = settings.message,
+                selection = TextRange(settings.message.length),
+            )
+        }
+    }
+
     GroupBox(
         titleContent = {
             Row(
@@ -52,11 +87,20 @@ fun MessageSection(
             ) {
                 Text(stringResource(R.string.message), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.weight(1f))
+                TextButton(onClick = { onPickImage(editorValue.selection.start.coerceIn(0, editorValue.text.length)) }) {
+                    Text(stringResource(R.string.insert_image))
+                }
                 MessageTemplatesControls(
                     library = library,
                     message = settings.message,
                     onSelectMessage = { selected ->
-                        onUpdate { it.copy(message = selected.withUppercaseMode(it.uppercaseEnabled)) }
+                        onUpdate {
+                            it.copy(
+                                message = selected.withUppercaseMode(it.uppercaseEnabled),
+                                messageImages = emptyList(),
+                                textColorSpans = emptyList(),
+                            )
+                        }
                     },
                     onLibraryChange = onLibraryChange,
                 )
@@ -75,20 +119,142 @@ fun MessageSection(
 
         val editorDirection = settings.slideDirection.layoutDirectionOrNull() ?: LocalLayoutDirection.current
         CompositionLocalProvider(LocalLayoutDirection provides editorDirection) {
+            val styledEditorValue = TextFieldValue(
+                annotatedString = editorValue.text.annotatedWithTextColors(settings.textColorSpans),
+                selection = editorValue.selection,
+                composition = editorValue.composition,
+            )
+            val placeholderBackground = MaterialTheme.colorScheme.surfaceVariant
+            val placeholderForeground = MaterialTheme.colorScheme.onSurfaceVariant
+            val imagePlaceholderTransformation = remember(
+                settings.messageImages,
+                placeholderBackground,
+                placeholderForeground,
+            ) {
+                MessageImageVisualTransformation(
+                    images = settings.messageImages,
+                    placeholderBackground = placeholderBackground,
+                    placeholderForeground = placeholderForeground,
+                )
+            }
+
             BasicTextField(
-                value = settings.message,
+                value = styledEditorValue,
+                visualTransformation = imagePlaceholderTransformation,
                 onValueChange = { value ->
-                    onUpdate { it.copy(message = value.withUppercaseMode(it.uppercaseEnabled)) }
+                    val nextText = value.text.withUppercaseMode(settings.uppercaseEnabled)
+                    editorValue = if (nextText == value.text) {
+                        TextFieldValue(
+                            text = value.text,
+                            selection = value.selection,
+                            composition = value.composition,
+                        )
+                    } else {
+                        TextFieldValue(text = nextText, selection = TextRange(nextText.length))
+                    }
+                    onUpdate {
+                        it.copy(
+                            message = nextText,
+                            messageImages = it.messageImages.adjustAnchors(
+                                oldText = settings.message,
+                                newText = nextText,
+                            ),
+                            textColorSpans = it.textColorSpans.adjustTextColorSpans(
+                                oldText = settings.message,
+                                newText = nextText,
+                            ),
+                        )
+                    }
                 },
-                textStyle = TextStyle(color = editorForeground, fontSize = 22.sp, fontWeight = FontWeight.Medium),
+                textStyle = TextStyle(
+                    color = editorForeground,
+                    fontSize = 22.sp,
+                    fontFamily = settings.messageFontFamily.composeFontFamily(),
+                    fontStyle = settings.messageFontStyle.composeFontStyle(),
+                    fontWeight = settings.messageFontStyle.composeEditorFontWeight(),
+                ),
                 cursorBrush = SolidColor(editorForeground),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 120.dp)
+                    .heightIn(min = 88.dp)
                     .background(editorBackground, RoundedCornerShape(8.dp))
-                    .padding(12.dp),
+                    .padding(10.dp),
             )
         }
+
+        val selectionStart = minOf(editorValue.selection.start, editorValue.selection.end)
+            .coerceIn(0, editorValue.text.length)
+        val selectionEnd = maxOf(editorValue.selection.start, editorValue.selection.end)
+            .coerceIn(0, editorValue.text.length)
+        val hasSelection = selectionStart < selectionEnd
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            ColorPickerField(
+                label = stringResource(R.string.selected_text_color),
+                color = selectedTextColor,
+                onColorChange = { selectedTextColor = it },
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(
+                enabled = hasSelection,
+                onClick = {
+                    onUpdate {
+                        it.copy(
+                            textColorSpans = it.textColorSpans.applyTextColor(
+                                start = selectionStart,
+                                end = selectionEnd,
+                                color = selectedTextColor,
+                            ),
+                        )
+                    }
+                },
+            ) {
+                Text(stringResource(R.string.apply_text_color))
+            }
+            TextButton(
+                enabled = hasSelection,
+                onClick = {
+                    onUpdate {
+                        it.copy(
+                            textColorSpans = it.textColorSpans.removeTextColor(
+                                start = selectionStart,
+                                end = selectionEnd,
+                            ),
+                        )
+                    }
+                },
+            ) {
+                Text(stringResource(R.string.clear_text_color))
+            }
+        }
+
+        settings.messageImages
+            .sortedBy { it.insertionIndex }
+            .forEach { image ->
+                MessageImageRow(
+                    imageUri = image.uri,
+                    insertionIndex = image.insertionIndex,
+                    durationSeconds = image.durationSeconds,
+                    onDurationChange = { duration ->
+                        onUpdate {
+                            it.copy(
+                                messageImages = it.messageImages.map { existing ->
+                                    if (existing.id == image.id) {
+                                        existing.copy(durationSeconds = duration.coerceImageDuration())
+                                    } else {
+                                        existing
+                                    }
+                                },
+                            )
+                        }
+                    },
+                    onRemove = { onRemoveImage(image.id) },
+                )
+            }
 
         ToggleRow(
             label = stringResource(R.string.uppercase_mode),
@@ -98,18 +264,214 @@ fun MessageSection(
             },
         )
 
-        Text(stringResource(R.string.slide_direction), style = MaterialTheme.typography.labelLarge)
+        Text(stringResource(R.string.font), style = MaterialTheme.typography.labelLarge)
         EnumSegmented(
-            options = SlideDirection.entries,
-            selected = settings.slideDirection,
+            options = MessageFontFamily.entries,
+            selected = settings.messageFontFamily,
             labelKey = { it.titleKey },
-            onSelect = { direction -> onUpdate { it.copy(slideDirection = direction) } },
+            onSelect = { family -> onUpdate { it.copy(messageFontFamily = family) } },
         )
+
+        Text(stringResource(R.string.font_style), style = MaterialTheme.typography.labelLarge)
+        EnumSegmented(
+            options = MessageFontStyle.entries,
+            selected = settings.messageFontStyle,
+            labelKey = { it.titleKey },
+            onSelect = { style -> onUpdate { it.copy(messageFontStyle = style) } },
+        )
+    }
+}
+
+@Composable
+private fun MessageImageRow(
+    imageUri: String,
+    insertionIndex: Int,
+    durationSeconds: Double,
+    onDurationChange: (Double) -> Unit,
+    onRemove: () -> Unit,
+) {
+    val context = LocalContext.current
+    val bitmap = androidx.compose.runtime.remember(imageUri) {
+        loadMessageImageBitmap(context, imageUri)
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(72.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(6.dp)),
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(72.dp)
+                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(6.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(stringResource(R.string.image))
+            }
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(stringResource(R.string.image), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                stringResource(R.string.image_insert_position, insertionIndex),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            FilledTonalIconButton(
+                onClick = { onDurationChange(durationSeconds - 0.1) },
+                modifier = Modifier.size(36.dp),
+            ) { Text("\u2212", fontSize = 18.sp) }
+            Text(
+                stringResource(R.string.value_seconds, durationSeconds.toFloat()),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            FilledTonalIconButton(
+                onClick = { onDurationChange(durationSeconds + 0.1) },
+                modifier = Modifier.size(36.dp),
+            ) { Text("+", fontSize = 18.sp) }
+        }
+        TextButton(onClick = onRemove) {
+            Text(stringResource(R.string.remove))
+        }
     }
 }
 
 private fun String.withUppercaseMode(enabled: Boolean): String =
     if (enabled) uppercase() else this
+
+private fun String.annotatedWithTextColors(spans: List<MessageTextColorSpan>): AnnotatedString =
+    buildAnnotatedString {
+        append(this@annotatedWithTextColors)
+        spans.forEach { span ->
+            val start = span.start.coerceIn(0, length)
+            val end = span.end.coerceIn(0, length)
+            if (start < end) {
+                addStyle(SpanStyle(color = span.color), start, end)
+            }
+        }
+    }
+
+private fun List<MessageImage>.adjustAnchors(
+    oldText: String,
+    newText: String,
+): List<MessageImage> {
+    if (oldText == newText) return map { it.copy(insertionIndex = it.insertionIndex.coerceIn(0, newText.length)) }
+
+    var prefix = 0
+    while (prefix < oldText.length && prefix < newText.length && oldText[prefix] == newText[prefix]) {
+        prefix += 1
+    }
+
+    var suffix = 0
+    while (
+        suffix < oldText.length - prefix &&
+        suffix < newText.length - prefix &&
+        oldText[oldText.length - 1 - suffix] == newText[newText.length - 1 - suffix]
+    ) {
+        suffix += 1
+    }
+
+    val removed = oldText.length - prefix - suffix
+    val inserted = newText.length - prefix - suffix
+    val delta = inserted - removed
+    val replacedEnd = prefix + removed
+
+    return map { image ->
+        val nextIndex = when {
+            image.insertionIndex < prefix -> image.insertionIndex
+            image.insertionIndex >= replacedEnd -> image.insertionIndex + delta
+            else -> prefix + inserted
+        }.coerceIn(0, newText.length)
+        image.copy(insertionIndex = nextIndex)
+    }
+}
+
+private fun Double.coerceImageDuration(): Double =
+    coerceIn(0.15, 10.0)
+
+private fun List<MessageTextColorSpan>.adjustTextColorSpans(
+    oldText: String,
+    newText: String,
+): List<MessageTextColorSpan> {
+    if (oldText == newText) {
+        return mapNotNull { span ->
+            val start = span.start.coerceIn(0, newText.length)
+            val end = span.end.coerceIn(0, newText.length)
+            if (start < end) span.copy(start = start, end = end) else null
+        }
+    }
+
+    var prefix = 0
+    while (prefix < oldText.length && prefix < newText.length && oldText[prefix] == newText[prefix]) {
+        prefix += 1
+    }
+
+    var suffix = 0
+    while (
+        suffix < oldText.length - prefix &&
+        suffix < newText.length - prefix &&
+        oldText[oldText.length - 1 - suffix] == newText[newText.length - 1 - suffix]
+    ) {
+        suffix += 1
+    }
+
+    val removed = oldText.length - prefix - suffix
+    val inserted = newText.length - prefix - suffix
+    val delta = inserted - removed
+    val replacedEnd = prefix + removed
+
+    fun adjustIndex(index: Int): Int = when {
+        index < prefix -> index
+        index >= replacedEnd -> index + delta
+        else -> prefix + inserted
+    }.coerceIn(0, newText.length)
+
+    return mapNotNull { span ->
+        val start = adjustIndex(span.start)
+        val end = adjustIndex(span.end)
+        if (start < end) span.copy(start = start, end = end) else null
+    }
+}
+
+private fun List<MessageTextColorSpan>.applyTextColor(
+    start: Int,
+    end: Int,
+    color: Color,
+): List<MessageTextColorSpan> =
+    removeTextColor(start, end) + MessageTextColorSpan(start = start, end = end, color = color)
+
+private fun List<MessageTextColorSpan>.removeTextColor(
+    start: Int,
+    end: Int,
+): List<MessageTextColorSpan> =
+    flatMap { span ->
+        when {
+            end <= span.start || start >= span.end -> listOf(span)
+            start <= span.start && end >= span.end -> emptyList()
+            start <= span.start -> listOf(span.copy(start = end.coerceAtMost(span.end)))
+            end >= span.end -> listOf(span.copy(end = start.coerceAtLeast(span.start)))
+            else -> listOf(
+                span.copy(end = start),
+                span.copy(start = end),
+            )
+        }
+    }.filter { it.start < it.end }
 
 private fun SlideDirection.layoutDirectionOrNull(): LayoutDirection? =
     when (isRightToLeft) {
@@ -138,6 +500,22 @@ fun ModeSection(
                 labelKey = { it.titleKey },
                 onSelect = { style -> onUpdate { it.copy(transitionStyle = style) } },
             )
+            Text(stringResource(R.string.slide_direction), style = MaterialTheme.typography.labelLarge)
+            EnumSegmented(
+                options = SlideDirection.entries,
+                selected = settings.slideDirection,
+                labelKey = { it.titleKey },
+                onSelect = { direction -> onUpdate { it.copy(slideDirection = direction) } },
+            )
+            if (settings.transitionStyle.isContinuousSlide) {
+                Text(stringResource(R.string.slide_image_behavior), style = MaterialTheme.typography.labelLarge)
+                EnumSegmented(
+                    options = SlideImageBehavior.entries,
+                    selected = settings.slideImageBehavior,
+                    labelKey = { it.titleKey },
+                    onSelect = { behavior -> onUpdate { it.copy(slideImageBehavior = behavior) } },
+                )
+            }
         }
     }
 }
@@ -182,16 +560,24 @@ fun RhythmSection(
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(R.string.repeats), style = MaterialTheme.typography.bodyLarge)
             Spacer(Modifier.weight(1f))
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilledTonalIconButton(
                     onClick = { onUpdate { it.copy(repeatCount = (it.repeatCount - 1).coerceAtLeast(1)) } },
+                    modifier = Modifier.size(40.dp),
                 ) { Text("\u2212", fontSize = 20.sp) }
                 Text("${settings.repeatCount}", style = MaterialTheme.typography.titleMedium)
                 FilledTonalIconButton(
                     onClick = { onUpdate { it.copy(repeatCount = (it.repeatCount + 1).coerceAtMost(20)) } },
+                    modifier = Modifier.size(40.dp),
                 ) { Text("+", fontSize = 20.sp) }
             }
         }
+
+        ToggleRow(
+            label = stringResource(R.string.repeat_forever),
+            checked = settings.repeatForever,
+            onCheckedChange = { enabled -> onUpdate { it.copy(repeatForever = enabled) } },
+        )
 
         if (settings.mode == TransmissionMode.VISUAL) {
             LabeledSlider(
@@ -225,16 +611,23 @@ fun SignalSection(
     onUpdate: ((TransmissionSettings) -> TransmissionSettings) -> Unit,
 ) {
     GroupBox(title = stringResource(R.string.attention_signal)) {
-        ToggleRow(
-            label = stringResource(R.string.sound),
-            checked = settings.soundSignalEnabled,
-            onCheckedChange = { on -> onUpdate { it.copy(soundSignalEnabled = on) } },
-        )
-        ToggleRow(
-            label = stringResource(R.string.start_flash),
-            checked = settings.visualSignalEnabled,
-            onCheckedChange = { on -> onUpdate { it.copy(visualSignalEnabled = on) } },
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            ToggleRow(
+                label = stringResource(R.string.sound),
+                checked = settings.soundSignalEnabled,
+                onCheckedChange = { on -> onUpdate { it.copy(soundSignalEnabled = on) } },
+                modifier = Modifier.weight(1f),
+            )
+            ToggleRow(
+                label = stringResource(R.string.start_flash),
+                checked = settings.visualSignalEnabled,
+                onCheckedChange = { on -> onUpdate { it.copy(visualSignalEnabled = on) } },
+                modifier = Modifier.weight(1f),
+            )
+        }
         if (settings.mode == TransmissionMode.MORSE) {
             ToggleRow(
                 label = stringResource(R.string.morse_beep),
@@ -261,8 +654,18 @@ fun SignalSection(
 }
 
 @Composable
-fun ToggleRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+fun ToggleRow(
+    label: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 48.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(label, style = MaterialTheme.typography.bodyLarge)
         Spacer(Modifier.weight(1f))
         Switch(checked = checked, onCheckedChange = onCheckedChange)

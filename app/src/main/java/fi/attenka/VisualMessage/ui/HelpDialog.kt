@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import fi.attenka.VisualMessage.BuildConfig
 import fi.attenka.VisualMessage.R
 import fi.attenka.VisualMessage.model.MorseCode
 
@@ -33,6 +34,11 @@ fun HelpDialog(onDismiss: () -> Unit) {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
+                Text(
+                    "VisualMessage v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 Text(stringResource(R.string.help_summary))
                 HelpSection(
                     title = stringResource(R.string.help_visual_title),

@@ -1,6 +1,7 @@
 package fi.attenka.VisualMessage.ui
 
 import android.Manifest
+import android.net.Uri
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -45,7 +47,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import fi.attenka.VisualMessage.BuildConfig
 import fi.attenka.VisualMessage.R
 import fi.attenka.VisualMessage.ads.AdBannerHost
 import fi.attenka.VisualMessage.model.MessageLibrary
@@ -60,11 +61,21 @@ fun ContentScreen(
     player: TransmissionPlayer,
     onUpdateSettings: ((TransmissionSettings) -> TransmissionSettings) -> Unit,
     onLibraryChange: (MessageLibrary) -> Unit,
+    onImportImage: (Uri, Int) -> Unit,
+    onRemoveImage: (String) -> Unit,
     onOpenReceiver: () -> Unit = {},
 ) {
     val context = LocalContext.current
     var pendingTorchSend by remember { mutableStateOf(false) }
     var showHelp by remember { mutableStateOf(false) }
+    var pendingImageInsertionIndex by remember { mutableStateOf(0) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            onImportImage(uri, pendingImageInsertionIndex)
+        }
+    }
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
@@ -114,6 +125,11 @@ fun ContentScreen(
                 library = library,
                 onUpdateSettings = onUpdateSettings,
                 onLibraryChange = onLibraryChange,
+                onPickImage = { insertionIndex ->
+                    pendingImageInsertionIndex = insertionIndex
+                    imagePickerLauncher.launch("image/*")
+                },
+                onRemoveImage = onRemoveImage,
             )
             AdBannerHost()
         }
@@ -149,12 +165,12 @@ private fun Header(
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 14.dp, vertical = 8.dp),
     ) {
-        val compact = maxWidth < 520.dp
+        val compact = maxWidth < 430.dp
 
         if (compact) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 HeaderIdentity(progressText = progressText)
                 HeaderActions(
                     settings = settings,
@@ -167,7 +183,7 @@ private fun Header(
         } else {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 HeaderIdentity(progressText = progressText, modifier = Modifier.weight(1f))
                 HeaderActions(
@@ -189,21 +205,16 @@ private fun HeaderIdentity(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Image(
             painter = painterResource(R.drawable.launch_logo),
             contentDescription = null,
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)),
+            modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)),
         )
         Column(modifier = Modifier.weight(1f)) {
-            Text("VisualMessage", style = MaterialTheme.typography.titleLarge)
-            Text(
-                "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Text("VisualMessage", style = MaterialTheme.typography.titleMedium)
             Text(
                 progressText,
                 style = MaterialTheme.typography.bodySmall,
@@ -224,7 +235,7 @@ private fun HeaderActions(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         TextButton(onClick = onOpenHelp) {
             Text(stringResource(R.string.help))
@@ -234,7 +245,9 @@ private fun HeaderActions(
         }
         Button(
             onClick = onSend,
-            enabled = settings.message.trim().isNotEmpty(),
+            enabled = settings.message.trim().isNotEmpty() ||
+                (settings.mode == TransmissionMode.VISUAL && settings.messageImages.isNotEmpty()),
+            modifier = Modifier.height(44.dp),
         ) {
             Text("\u25B6")
             Spacer(Modifier.size(6.dp))
@@ -250,6 +263,8 @@ private fun Controls(
     library: MessageLibrary,
     onUpdateSettings: ((TransmissionSettings) -> TransmissionSettings) -> Unit,
     onLibraryChange: (MessageLibrary) -> Unit,
+    onPickImage: (Int) -> Unit,
+    onRemoveImage: (String) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -258,10 +273,10 @@ private fun Controls(
                 .widthIn(max = 760.dp)
                 .align(Alignment.TopCenter)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            MessageSection(settings, library, onUpdateSettings, onLibraryChange)
+            MessageSection(settings, library, onUpdateSettings, onLibraryChange, onPickImage, onRemoveImage)
             ModeSection(settings, onUpdateSettings)
             if (settings.mode == TransmissionMode.MORSE) {
                 MorseSection(settings, onUpdateSettings)

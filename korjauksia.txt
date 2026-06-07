@@ -16,3 +16,17 @@ Added Slide vertical mode, where text scrolls vertically as word-based letter st
 Added an Uppercase option for message writing.
 
 Updated AndroidX dependencies for better Android 16 KB page size compatibility.
+
+1.0.4 (6)
+
+- Added Morse output selection: screen, flashlight, or both.
+- Added optional Morse beeps during transmission.
+- Morse transmission now shows the character being sent in the lower-right corner.
+- Updated the Help text for the new Morse settings.
+- Small improvements to feature parity between the Android and iOS versions.: 
+
+1.0.6
+
+Improved Morse code reception from distant light sources. The receiver now detects small bright flashes more reliably when the signal appears as a small point in the camera view.
+
+Also includes receiver stability improvements and general maintenance fixes.

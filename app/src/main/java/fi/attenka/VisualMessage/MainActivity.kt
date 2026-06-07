@@ -45,6 +45,8 @@ class MainActivity : ComponentActivity() {
                             player = player,
                             onUpdateSettings = settingsViewModel::updateSettings,
                             onLibraryChange = { newLibrary -> settingsViewModel.updateLibrary { newLibrary } },
+                            onImportImage = settingsViewModel::importMessageImage,
+                            onRemoveImage = settingsViewModel::removeMessageImage,
                             onOpenReceiver = { showReceiver = true },
                         )
                     }

@@ -18,6 +18,8 @@ fun resourceForKey(key: String): Int = when (key) {
     "Slide" -> R.string.transition_slide
     "Slide vertical" -> R.string.transition_slide_vertical
     "Scale" -> R.string.transition_scale
+    "Static between text" -> R.string.slide_image_static_between_text
+    "Slide with text" -> R.string.slide_image_slide_with_text
     "International" -> R.string.international
     "Continental" -> R.string.continental
     "Screen" -> R.string.morse_output_screen
@@ -26,6 +28,14 @@ fun resourceForKey(key: String): Int = when (key) {
     "Auto" -> R.string.slide_direction_auto
     "LTR" -> R.string.slide_direction_ltr
     "RTL" -> R.string.slide_direction_rtl
+    "Default" -> R.string.font_default
+    "Sans" -> R.string.font_sans
+    "Serif" -> R.string.font_serif
+    "Monospace" -> R.string.font_monospace
+    "Regular" -> R.string.font_style_regular
+    "Italic" -> R.string.font_style_italic
+    "Bold" -> R.string.font_style_bold
+    "Bold italic" -> R.string.font_style_bold_italic
     "Black / white" -> R.string.theme_black_white
     "White / black" -> R.string.theme_white_black
     "Black / orange" -> R.string.theme_black_orange

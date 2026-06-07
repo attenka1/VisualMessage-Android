@@ -35,7 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -45,15 +48,21 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fi.attenka.VisualMessage.R
 import fi.attenka.VisualMessage.model.FrameKind
 import fi.attenka.VisualMessage.model.SlideDirection
+import fi.attenka.VisualMessage.model.SlideImageBehavior
+import fi.attenka.VisualMessage.model.SlideItem
 import fi.attenka.VisualMessage.model.TransitionStyle
 import fi.attenka.VisualMessage.model.TransmissionFrame
 import fi.attenka.VisualMessage.model.TransmissionMode
 import fi.attenka.VisualMessage.model.TransmissionSettings
+import kotlinx.coroutines.isActive
+import kotlin.math.roundToInt
 
 @Composable
 fun PlaybackSurface(
@@ -77,7 +86,13 @@ fun PlaybackSurface(
                 transitionSpec = {
                     // Morse must switch instantly; a fade would smear the short white flashes
                     // over the gaps, making letter/word spacing impossible to read.
-                    val style = if (settings.mode == TransmissionMode.VISUAL) settings.transitionStyle else TransitionStyle.INSTANT
+                    // Static image frames stay centered; slide transitions would move them off-screen.
+                    val style = when {
+                        settings.mode != TransmissionMode.VISUAL -> TransitionStyle.INSTANT
+                        initialState.kind is FrameKind.Image || targetState.kind is FrameKind.Image ->
+                            TransitionStyle.INSTANT
+                        else -> settings.transitionStyle
+                    }
                     transitionFor(style, layoutDirection)
                 },
                 label = "frame",
@@ -132,15 +147,36 @@ private fun FrameContent(frame: TransmissionFrame, settings: TransmissionSetting
             val side = minOf(maxWidth.value, maxHeight.value)
             Text(
                 text = kind.value,
-                color = settings.activeTheme.foreground,
+                color = colorForText(kind.value, settings, kind.color),
                 fontSize = (side * 0.78f).sp,
-                fontWeight = FontWeight.Black,
+                fontFamily = settings.messageFontFamily.composeFontFamily(),
+                fontStyle = settings.messageFontStyle.composeFontStyle(),
+                fontWeight = settings.messageFontStyle.composeFontWeight(),
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+            )
+        }
+
+        is FrameKind.Whitespace -> BoxWithConstraints(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            val side = minOf(maxWidth.value, maxHeight.value)
+            Text(
+                text = visibleWhitespace(kind.value),
+                color = (kind.color ?: settings.activeTheme.foreground).copy(alpha = 0.72f),
+                fontSize = (side * 0.46f).sp,
+                fontFamily = settings.messageFontFamily.composeFontFamily(),
+                fontStyle = settings.messageFontStyle.composeFontStyle(),
+                fontWeight = settings.messageFontStyle.composeFontWeight(),
                 textAlign = TextAlign.Center,
                 maxLines = 1,
             )
         }
 
         is FrameKind.SlideMessage -> SlideMessageContent(kind, frame.durationSeconds, settings)
+
+        is FrameKind.Image -> ImageFrameContent(kind.uri)
 
         FrameKind.AppLogo -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Image(
@@ -168,6 +204,25 @@ private fun FrameContent(frame: TransmissionFrame, settings: TransmissionSetting
 }
 
 @Composable
+private fun ImageFrameContent(uri: String) {
+    val context = LocalContext.current
+    val bitmap = remember(uri) { loadMessageImageBitmap(context, uri) }
+
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .fillMaxSize(0.88f)
+                    .padding(24.dp),
+            )
+        }
+    }
+}
+
+@Composable
 private fun SlideMessageContent(
     kind: FrameKind.SlideMessage,
     durationSeconds: Double,
@@ -180,68 +235,176 @@ private fun SlideMessageContent(
         val side = minOf(maxWidth.value, maxHeight.value)
         val isVerticalSlide = settings.transitionStyle == TransitionStyle.SLIDE_VERTICAL
         val fontSize = side * if (isVerticalSlide) 0.46f else 0.62f
-        val text = if (isVerticalSlide) {
-            verticalSlideText(kind.characters)
-        } else {
-            kind.characters.joinToString(separator = "")
-        }
         val textStyle = MaterialTheme.typography.displayLarge.copy(
             color = settings.activeTheme.foreground,
             fontSize = fontSize.sp,
             lineHeight = (fontSize * 0.96f).sp,
-            fontWeight = FontWeight.Black,
+            fontFamily = settings.messageFontFamily.composeFontFamily(),
+            fontStyle = settings.messageFontStyle.composeFontStyle(),
+            fontWeight = settings.messageFontStyle.composeFontWeight(),
             textAlign = TextAlign.Center,
         )
+        val context = LocalContext.current
         val textMeasurer = rememberTextMeasurer()
         val density = LocalDensity.current
         val layoutDirection = LocalLayoutDirection.current
-        val textLayout = textMeasurer.measure(
-            text = text,
-            style = textStyle,
-            softWrap = false,
-        )
-        val textWidth = textLayout.size.width.toFloat()
-        val textHeight = textLayout.size.height.toFloat()
         val containerWidth = with(density) { maxWidth.toPx() }
         val containerHeight = with(density) { maxHeight.toPx() }
+        val slideItems = when (settings.slideImageBehavior) {
+            SlideImageBehavior.STATIC_BETWEEN_TEXT -> kind.items.filterIsInstance<SlideItem.Text>()
+            SlideImageBehavior.SLIDE_WITH_TEXT -> kind.items
+        }
+        val text = if (isVerticalSlide) verticalSlideText(slideItems) else null
+        val textLayout = text?.let {
+            textMeasurer.measure(
+                text = it,
+                style = textStyle,
+                softWrap = false,
+            )
+        }
+        val slideElements = if (isVerticalSlide) {
+            emptyList()
+        } else {
+            slideElements(
+                context = context,
+                items = slideItems,
+                textStyle = textStyle,
+                textMeasurer = textMeasurer,
+                imageHeightPx = with(density) { (fontSize * 0.95f).sp.toPx() },
+                imageGapPx = with(density) { 14.dp.toPx() },
+                settings = settings,
+            )
+        }
+        val contentWidth = textLayout?.size?.width?.toFloat() ?: slideElements.sumOf { it.width.toDouble() }.toFloat()
+        val contentHeight = textLayout?.size?.height?.toFloat() ?: slideElements.maxOfOrNull { it.height } ?: 0f
         val isRtl = layoutDirection == LayoutDirection.Rtl
         val startOffset = when {
-            isVerticalSlide && isRtl -> -textHeight
+            isVerticalSlide && isRtl -> -contentHeight
             isVerticalSlide -> containerHeight
-            isRtl -> -textWidth
+            isRtl -> -contentWidth
             else -> containerWidth
         }
         val targetOffset = when {
             isVerticalSlide && isRtl -> containerHeight
-            isVerticalSlide -> -textHeight
+            isVerticalSlide -> -contentHeight
             isRtl -> containerWidth
-            else -> -textWidth
+            else -> -contentWidth
         }
-        val animatedOffset = remember(text, startOffset, layoutDirection) { Animatable(startOffset) }
-        LaunchedEffect(text, startOffset, targetOffset, durationSeconds, layoutDirection, isVerticalSlide) {
-            animatedOffset.snapTo(startOffset)
-            animatedOffset.animateTo(
-                targetValue = targetOffset,
-                animationSpec = tween(
-                    durationMillis = (durationSeconds * 1000).toInt().coerceAtLeast(220),
-                    easing = LinearEasing,
-                ),
+        val animationKey = slideItems.joinToString("|") {
+            when (it) {
+                is SlideItem.Text -> it.value
+                is SlideItem.Image -> it.uri
+            }
+        }
+        val animatedOffset = remember(animationKey, startOffset, layoutDirection) { Animatable(startOffset) }
+        LaunchedEffect(animationKey, startOffset, targetOffset, durationSeconds, layoutDirection, isVerticalSlide) {
+            val animationSpec = tween<Float>(
+                durationMillis = (durationSeconds * 1000).toInt().coerceAtLeast(220),
+                easing = LinearEasing,
             )
+            if (settings.repeatForever &&
+                settings.transitionStyle == TransitionStyle.SLIDE &&
+                settings.slideImageBehavior == SlideImageBehavior.SLIDE_WITH_TEXT
+            ) {
+                while (isActive) {
+                    animatedOffset.snapTo(startOffset)
+                    animatedOffset.animateTo(
+                        targetValue = targetOffset,
+                        animationSpec = animationSpec,
+                    )
+                }
+            } else {
+                animatedOffset.snapTo(startOffset)
+                animatedOffset.animateTo(
+                    targetValue = targetOffset,
+                    animationSpec = animationSpec,
+                )
+            }
         }
 
         Canvas(modifier = Modifier.fillMaxSize()) {
-            drawText(
-                textLayoutResult = textLayout,
-                topLeft = Offset(
-                    x = if (isVerticalSlide) (size.width - textWidth) / 2f else animatedOffset.value,
-                    y = if (isVerticalSlide) animatedOffset.value else (size.height - textHeight) / 2f,
-                ),
-            )
+            if (textLayout != null) {
+                drawText(
+                    textLayoutResult = textLayout,
+                    topLeft = Offset(
+                        x = (size.width - contentWidth) / 2f,
+                        y = animatedOffset.value,
+                    ),
+                )
+            } else {
+                var cursor = animatedOffset.value
+                slideElements.forEach { element ->
+                    val y = (size.height - element.height) / 2f
+                    when (element) {
+                        is SlideDrawable.Text -> drawText(
+                            textLayoutResult = element.layout,
+                            topLeft = Offset(cursor, y),
+                        )
+                        is SlideDrawable.Image -> drawImage(
+                            image = element.bitmap,
+                            dstOffset = IntOffset((cursor + element.leadingGap).roundToInt(), y.roundToInt()),
+                            dstSize = IntSize(element.imageWidth.roundToInt(), element.height.roundToInt()),
+                        )
+                    }
+                    cursor += element.width
+                }
+            }
         }
     }
 }
 
-private fun verticalSlideText(characters: List<String>): String {
+private sealed interface SlideDrawable {
+    val width: Float
+    val height: Float
+
+    data class Text(val layout: androidx.compose.ui.text.TextLayoutResult) : SlideDrawable {
+        override val width: Float = layout.size.width.toFloat()
+        override val height: Float = layout.size.height.toFloat()
+    }
+
+    data class Image(
+        val bitmap: ImageBitmap,
+        val imageWidth: Float,
+        val leadingGap: Float,
+        override val width: Float,
+        override val height: Float,
+    ) : SlideDrawable
+}
+
+private fun slideElements(
+    context: android.content.Context,
+    items: List<SlideItem>,
+    textStyle: androidx.compose.ui.text.TextStyle,
+    textMeasurer: androidx.compose.ui.text.TextMeasurer,
+    imageHeightPx: Float,
+    imageGapPx: Float,
+    settings: TransmissionSettings,
+): List<SlideDrawable> =
+    items.mapNotNull { item ->
+        when (item) {
+            is SlideItem.Text -> SlideDrawable.Text(
+                textMeasurer.measure(
+                    text = item.value,
+                    style = textStyle.copy(color = colorForText(item.value, settings, item.color)),
+                    softWrap = false,
+                )
+            )
+            is SlideItem.Image -> {
+                val bitmap = loadMessageImageBitmap(context, item.uri) ?: return@mapNotNull null
+                val aspect = bitmap.width.toFloat() / bitmap.height.toFloat().coerceAtLeast(1f)
+                val imageWidth = imageHeightPx * aspect
+                SlideDrawable.Image(
+                    bitmap = bitmap,
+                    imageWidth = imageWidth,
+                    leadingGap = imageGapPx,
+                    width = imageWidth + (imageGapPx * 2f),
+                    height = imageHeightPx,
+                )
+            }
+        }
+    }
+
+private fun verticalSlideText(items: List<SlideItem>): String {
     val words = mutableListOf<List<String>>()
     val currentWord = mutableListOf<String>()
 
@@ -252,7 +415,8 @@ private fun verticalSlideText(characters: List<String>): String {
         }
     }
 
-    characters.forEach { character ->
+    items.filterIsInstance<SlideItem.Text>().forEach { item ->
+        val character = item.value
         if (character.isBlank()) {
             flushWord()
         } else {
@@ -273,6 +437,8 @@ private fun backgroundColor(frame: TransmissionFrame, settings: TransmissionSett
         FrameKind.AppLogo -> Color.Black
         FrameKind.Blank -> if (settings.mode == TransmissionMode.MORSE) Color.Black else settings.activeTheme.background
         is FrameKind.Character,
+        is FrameKind.Whitespace,
+        is FrameKind.Image,
         is FrameKind.SlideMessage,
         -> settings.activeTheme.background
     }
@@ -283,6 +449,29 @@ private fun morseLetter(frame: TransmissionFrame): String? =
         is FrameKind.MorseLetterGap -> kind.letter
         else -> null
     }
+
+private fun visibleWhitespace(value: String): String =
+    if (value.any { it == '\n' || it == '\r' }) "↵" else "␣"
+
+private val multicolorPalette = listOf(
+    Color(0xFFFF3B30),
+    Color(0xFFFF9500),
+    Color(0xFFFFCC00),
+    Color(0xFF34C759),
+    Color(0xFF007AFF),
+    Color(0xFFAF52DE),
+)
+
+private fun colorForText(value: String, settings: TransmissionSettings, manualColor: Color? = null): Color {
+    if (manualColor != null) {
+        return manualColor
+    }
+    if (!settings.multicolorLettersEnabled || value.isBlank()) {
+        return settings.activeTheme.foreground
+    }
+    val codePoint = value.codePointAt(0)
+    return multicolorPalette[kotlin.math.abs(codePoint) % multicolorPalette.size]
+}
 
 private fun transitionFor(style: TransitionStyle, layoutDirection: LayoutDirection) = when (style) {
     TransitionStyle.INSTANT -> (fadeIn(tween(0)) togetherWith fadeOut(tween(0)))

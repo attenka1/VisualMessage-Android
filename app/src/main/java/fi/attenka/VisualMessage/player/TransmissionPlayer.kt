@@ -13,6 +13,7 @@ import fi.attenka.VisualMessage.model.TransmissionMode
 import fi.attenka.VisualMessage.model.TransmissionSequenceBuilder
 import fi.attenka.VisualMessage.model.TransmissionSettings
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -42,8 +43,9 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
     fun start(settings: TransmissionSettings) {
         stop()
 
-        val frames = TransmissionSequenceBuilder.frames(settings)
-        if (frames.isEmpty()) return
+        val playbackSettings = repeatPlaybackSettings(settings)
+        val firstFrames = TransmissionSequenceBuilder.frames(playbackSettings)
+        if (firstFrames.isEmpty()) return
 
         isPlaying = true
 
@@ -64,19 +66,19 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
                     tonePlayer.playSignal(settings.signalFrequency)
                 }
 
-                frames.forEachIndexed { index, frame ->
-                    if (!isActive) return@launch
-                    currentFrame = frame
-                    val isMorseSignal = frame.kind is FrameKind.MorseSignal
-                    flashlightController.setEnabled(frame.shouldUseTorch(settings))
-                    tonePlayer.setContinuousToneEnabled(
-                        enabled = settings.mode == TransmissionMode.MORSE &&
-                            settings.morseSoundEnabled &&
-                            isMorseSignal,
-                        frequency = settings.signalFrequency,
+                if (settings.repeatForever) {
+                    var loopIndex = 1
+                    playFrames(firstFrames, settings, loopIndex)
+                    val loopSettings = playbackSettings.copy(
+                        visualSignalEnabled = false,
                     )
-                    progressText = "${index + 1} / ${frames.size}"
-                    delay((frame.durationSeconds * 1000).toLong())
+                    val loopFrames = TransmissionSequenceBuilder.frames(loopSettings)
+                    while (isActive && loopFrames.isNotEmpty()) {
+                        loopIndex += 1
+                        playFrames(loopFrames, settings, loopIndex)
+                    }
+                } else {
+                    playFrames(firstFrames, settings)
                 }
             } finally {
                 flashlightController.turnOff()
@@ -105,6 +107,36 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
         super.onCleared()
         tonePlayer.stop()
         flashlightController.turnOff()
+    }
+
+    private fun repeatPlaybackSettings(settings: TransmissionSettings): TransmissionSettings {
+        if (!settings.repeatForever) return settings
+        return settings.copy(repeatCount = 1)
+    }
+
+    private suspend fun playFrames(
+        frames: List<TransmissionFrame>,
+        settings: TransmissionSettings,
+        loopIndex: Int? = null,
+    ) {
+        frames.forEachIndexed { index, frame ->
+            if (!currentCoroutineContext().isActive) return
+            currentFrame = frame
+            val isMorseSignal = frame.kind is FrameKind.MorseSignal
+            flashlightController.setEnabled(frame.shouldUseTorch(settings))
+            tonePlayer.setContinuousToneEnabled(
+                enabled = settings.mode == TransmissionMode.MORSE &&
+                    settings.morseSoundEnabled &&
+                    isMorseSignal,
+                frequency = settings.signalFrequency,
+            )
+            progressText = if (settings.repeatForever) {
+                getApplication<Application>().getString(R.string.sending_infinite, loopIndex ?: 1, index + 1, frames.size)
+            } else {
+                "${index + 1} / ${frames.size}"
+            }
+            delay((frame.durationSeconds * 1000).toLong())
+        }
     }
 
     private fun TransmissionFrame.shouldUseTorch(settings: TransmissionSettings): Boolean =

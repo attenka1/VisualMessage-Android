@@ -20,6 +20,11 @@ enum class TransitionStyle(val titleKey: String) {
         get() = this == SLIDE || this == SLIDE_VERTICAL
 }
 
+enum class SlideImageBehavior(val titleKey: String) {
+    STATIC_BETWEEN_TEXT("Static between text"),
+    SLIDE_WITH_TEXT("Slide with text");
+}
+
 /** Morse code variant. */
 enum class MorseAlphabet(val titleKey: String) {
     INTERNATIONAL("International"),
@@ -52,14 +57,35 @@ enum class SlideDirection(val titleKey: String, val isRightToLeft: Boolean?) {
     RTL("RTL", true);
 }
 
+enum class MessageFontFamily(val titleKey: String) {
+    DEFAULT("Default"),
+    SANS("Sans"),
+    SERIF("Serif"),
+    MONOSPACE("Monospace");
+}
+
+enum class MessageFontStyle(val titleKey: String) {
+    REGULAR("Regular"),
+    ITALIC("Italic"),
+    BOLD("Bold"),
+    BOLD_ITALIC("Bold italic");
+}
+
 /** A single thing shown on the playback surface for a given duration. */
 sealed interface FrameKind {
-    data class Character(val value: String) : FrameKind
-    data class SlideMessage(val characters: List<String>, val index: Int) : FrameKind
+    data class Character(val value: String, val color: Color? = null) : FrameKind
+    data class Whitespace(val value: String, val color: Color? = null) : FrameKind
+    data class SlideMessage(val items: List<SlideItem>, val index: Int) : FrameKind
+    data class Image(val uri: String) : FrameKind
     data class MorseSignal(val letter: String) : FrameKind
     data class MorseLetterGap(val letter: String) : FrameKind
     data object AppLogo : FrameKind
     data object Blank : FrameKind
+}
+
+sealed interface SlideItem {
+    data class Text(val value: String, val color: Color? = null) : SlideItem
+    data class Image(val uri: String, val durationSeconds: Double = 0.7) : SlideItem
 }
 
 data class TransmissionFrame(
@@ -88,3 +114,16 @@ data class ColorTheme(
         )
     }
 }
+
+data class MessageImage(
+    val id: String,
+    val uri: String,
+    val insertionIndex: Int,
+    val durationSeconds: Double = 0.7,
+)
+
+data class MessageTextColorSpan(
+    val start: Int,
+    val end: Int,
+    val color: Color,
+)

@@ -60,7 +60,13 @@ fun ColorSection(
             )
         }
 
-        ThemePreview(settings.activeTheme)
+        ThemePreview(settings)
+
+        ToggleRow(
+            label = stringResource(R.string.multicolor_letters),
+            checked = settings.multicolorLettersEnabled,
+            onCheckedChange = { on -> onUpdate { it.copy(multicolorLettersEnabled = on) } },
+        )
 
         HorizontalDivider()
 
@@ -137,16 +143,24 @@ private fun ThemeSwatch(theme: ColorTheme) {
 }
 
 @Composable
-private fun ThemePreview(theme: ColorTheme) {
+private fun ThemePreview(settings: TransmissionSettings) {
+    val theme = settings.activeTheme
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(76.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(theme.background)
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center,
     ) {
-        Text("A", color = theme.foreground, fontSize = 72.sp, fontWeight = FontWeight.Black)
+        Text(
+            "A",
+            color = theme.foreground,
+            fontSize = 54.sp,
+            fontFamily = settings.messageFontFamily.composeFontFamily(),
+            fontStyle = settings.messageFontStyle.composeFontStyle(),
+            fontWeight = settings.messageFontStyle.composeFontWeight(),
+        )
     }
 }

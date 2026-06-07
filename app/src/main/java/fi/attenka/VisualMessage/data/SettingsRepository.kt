@@ -3,6 +3,10 @@ package fi.attenka.VisualMessage.data
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import fi.attenka.VisualMessage.model.MessageLibrary
+import fi.attenka.VisualMessage.model.MessageImage
+import fi.attenka.VisualMessage.model.MessageFontFamily
+import fi.attenka.VisualMessage.model.MessageFontStyle
+import fi.attenka.VisualMessage.model.MessageTextColorSpan
 import fi.attenka.VisualMessage.model.MorseAlphabet
 import fi.attenka.VisualMessage.model.MorseOutputMode
 import fi.attenka.VisualMessage.model.SlideDirection
@@ -47,15 +51,22 @@ class SettingsRepository(context: Context) {
 
     private fun encodeSettings(s: TransmissionSettings): JSONObject = JSONObject().apply {
         put("message", s.message)
+        put("messageImages", encodeMessageImages(s.messageImages))
+        put("textColorSpans", encodeTextColorSpans(s.textColorSpans))
         put("mode", s.mode.name)
         put("themeID", s.themeID)
+        put("multicolorLettersEnabled", s.multicolorLettersEnabled)
         put("customEditorColorsEnabled", s.customEditorColorsEnabled)
         put("slideDirection", s.slideDirection.name)
+        put("slideImageBehavior", s.slideImageBehavior.name)
         put("uppercaseEnabled", s.uppercaseEnabled)
+        put("messageFontFamily", s.messageFontFamily.name)
+        put("messageFontStyle", s.messageFontStyle.name)
         put("characterDuration", s.characterDuration)
         put("emojiDuration", s.emojiDuration)
         put("characterGap", s.characterGap)
         put("repeatCount", s.repeatCount)
+        put("repeatForever", s.repeatForever)
         put("transitionStyle", s.transitionStyle.name)
         put("soundSignalEnabled", s.soundSignalEnabled)
         put("visualSignalEnabled", s.visualSignalEnabled)
@@ -74,21 +85,32 @@ class SettingsRepository(context: Context) {
 
     private fun decodeSettings(json: JSONObject): TransmissionSettings {
         val defaults = TransmissionSettings()
+        val message = json.optString("message", defaults.message)
+        val characterDuration = json.optDouble("characterDuration", defaults.characterDuration)
+        val emojiDuration = json.optDouble("emojiDuration", defaults.emojiDuration)
+        val defaultImageDuration = emojiDuration.coerceAtLeast(characterDuration)
         val legacyTorchEnabled = json.optBoolean("torchSignalEnabled", defaults.torchSignalEnabled)
         val outputMode = json.optEnumOrNull<MorseOutputMode>("morseOutputMode")
             ?: if (legacyTorchEnabled) MorseOutputMode.SCREEN_AND_TORCH else defaults.morseOutputMode
 
         return defaults.copy(
-            message = json.optString("message", defaults.message),
+            message = message,
+            messageImages = json.optMessageImages(defaults.messageImages, message.length, defaultImageDuration),
+            textColorSpans = json.optTextColorSpans(defaults.textColorSpans, message.length),
             mode = json.optEnum("mode", defaults.mode),
             themeID = json.optString("themeID", defaults.themeID),
+            multicolorLettersEnabled = json.optBoolean("multicolorLettersEnabled", defaults.multicolorLettersEnabled),
             customEditorColorsEnabled = json.optBoolean("customEditorColorsEnabled", defaults.customEditorColorsEnabled),
             slideDirection = json.optSlideDirection(defaults.slideDirection),
+            slideImageBehavior = json.optEnum("slideImageBehavior", defaults.slideImageBehavior),
             uppercaseEnabled = json.optBoolean("uppercaseEnabled", defaults.uppercaseEnabled),
-            characterDuration = json.optDouble("characterDuration", defaults.characterDuration),
-            emojiDuration = json.optDouble("emojiDuration", defaults.emojiDuration),
+            messageFontFamily = json.optEnum("messageFontFamily", defaults.messageFontFamily),
+            messageFontStyle = json.optEnum("messageFontStyle", defaults.messageFontStyle),
+            characterDuration = characterDuration,
+            emojiDuration = emojiDuration,
             characterGap = json.optDouble("characterGap", defaults.characterGap),
             repeatCount = json.optInt("repeatCount", defaults.repeatCount),
+            repeatForever = json.optBoolean("repeatForever", defaults.repeatForever),
             transitionStyle = json.optEnum("transitionStyle", defaults.transitionStyle),
             soundSignalEnabled = json.optBoolean("soundSignalEnabled", defaults.soundSignalEnabled),
             visualSignalEnabled = json.optBoolean("visualSignalEnabled", defaults.visualSignalEnabled),
@@ -125,6 +147,76 @@ class SettingsRepository(context: Context) {
             blue = obj.optDouble("blue", 1.0).toFloat(),
             alpha = obj.optDouble("opacity", 1.0).toFloat(),
         )
+    }
+
+    private fun encodeMessageImages(images: List<MessageImage>): JSONArray {
+        val array = JSONArray()
+        images.forEach { image ->
+            array.put(
+                JSONObject().apply {
+                    put("id", image.id)
+                    put("uri", image.uri)
+                    put("insertionIndex", image.insertionIndex)
+                    put("durationSeconds", image.durationSeconds)
+                }
+            )
+        }
+        return array
+    }
+
+    private fun JSONObject.optMessageImages(
+        fallback: List<MessageImage>,
+        messageLength: Int,
+        defaultDurationSeconds: Double,
+    ): List<MessageImage> {
+        val array = optJSONArray("messageImages") ?: return fallback
+        return buildList {
+            for (index in 0 until array.length()) {
+                val item = array.optJSONObject(index) ?: continue
+                val id = item.optString("id", "").takeIf { it.isNotBlank() } ?: continue
+                val uri = item.optString("uri", "").takeIf { it.isNotBlank() } ?: continue
+                add(
+                    MessageImage(
+                        id = id,
+                        uri = uri,
+                        insertionIndex = item.optInt("insertionIndex", messageLength).coerceIn(0, messageLength),
+                        durationSeconds = item.optDouble("durationSeconds", defaultDurationSeconds).coerceIn(0.15, 10.0),
+                    )
+                )
+            }
+        }
+    }
+
+    private fun encodeTextColorSpans(spans: List<MessageTextColorSpan>): JSONArray {
+        val array = JSONArray()
+        spans.forEach { span ->
+            array.put(
+                JSONObject().apply {
+                    put("start", span.start)
+                    put("end", span.end)
+                    put("color", encodeColor(span.color))
+                }
+            )
+        }
+        return array
+    }
+
+    private fun JSONObject.optTextColorSpans(
+        fallback: List<MessageTextColorSpan>,
+        messageLength: Int,
+    ): List<MessageTextColorSpan> {
+        val array = optJSONArray("textColorSpans") ?: return fallback
+        return buildList {
+            for (index in 0 until array.length()) {
+                val item = array.optJSONObject(index) ?: continue
+                val start = item.optInt("start", 0).coerceIn(0, messageLength)
+                val end = item.optInt("end", start).coerceIn(0, messageLength)
+                val color = item.optColor("color", Color.Unspecified)
+                if (start < end && color != Color.Unspecified) {
+                    add(MessageTextColorSpan(start = start, end = end, color = color))
+                }
+            }
+        }
     }
 
     private inline fun <reified T : Enum<T>> JSONObject.optEnum(key: String, fallback: T): T {
