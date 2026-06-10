@@ -23,12 +23,12 @@ data class TransmissionSettings(
     val messageFontStyle: MessageFontStyle = MessageFontStyle.BOLD,
     val editorForeground: Color = DefaultEditorForeground,
     val editorBackground: Color = DefaultEditorBackground,
-    val characterDuration: Double = 0.7,
+    val characterDuration: Double = 0.15,
     val emojiDuration: Double = 0.7,
-    val characterGap: Double = 0.18,
-    val repeatCount: Int = 1,
+    val characterGap: Double = 0.20,
+    val repeatCount: Int = 2,
     val repeatForever: Boolean = false,
-    val transitionStyle: TransitionStyle = TransitionStyle.FADE,
+    val transitionStyle: TransitionStyle = TransitionStyle.SLIDE,
     val soundSignalEnabled: Boolean = true,
     val visualSignalEnabled: Boolean = true,
     val morseSoundEnabled: Boolean = false,
@@ -37,6 +37,8 @@ data class TransmissionSettings(
     val startDelaySeconds: Int = 2,
     val morseUnitDuration: Double = 0.24, // 5 WPM (unit = 1.2 / WPM)
     val morseAlphabet: MorseAlphabet = MorseAlphabet.INTERNATIONAL,
+    /** Playback text scale relative to the auto-fit maximum. 1.0 fills the screen. */
+    val characterSizeScale: Double = 1.0,
 ) {
     val torchSignalEnabled: Boolean
         get() = morseOutputMode.usesTorch
@@ -59,6 +61,14 @@ data class TransmissionSettings(
 
     fun withWordsPerMinute(wpm: Double): TransmissionSettings =
         copy(morseUnitDuration = 1.2 / wpm.coerceAtLeast(1.0))
+
+    fun playbackSingleCharacterFontSizeSp(widthDp: Float, heightDp: Float): Float =
+        minOf(widthDp * 0.98f, heightDp * 0.98f) * 1.05f * characterSizeScale.toFloat()
+
+    fun playbackSlideFontSizeSp(sideDp: Float, baseFraction: Float): Float =
+        sideDp * baseFraction * characterSizeScale.toFloat()
+
+    fun playbackImageFillFraction(): Float = 0.88f * characterSizeScale.toFloat()
 
     companion object {
         // Sentinel values that mean "use the theme default" so they survive persistence.

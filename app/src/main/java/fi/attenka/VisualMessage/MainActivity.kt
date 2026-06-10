@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.gms.ads.MobileAds
 import fi.attenka.VisualMessage.player.TransmissionPlayer
 import fi.attenka.VisualMessage.receive.ReceiveScreen
 import fi.attenka.VisualMessage.ui.ContentScreen
@@ -22,8 +21,6 @@ import fi.attenka.VisualMessage.ui.theme.VisualMessageTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        MobileAds.initialize(this)
 
         enableEdgeToEdge()
         setContent {

@@ -68,13 +68,16 @@ fun MessageSection(
     onPickImage: (Int) -> Unit,
     onRemoveImage: (String) -> Unit,
 ) {
-    var editorValue by remember { mutableStateOf(TextFieldValue(settings.message)) }
+    var editorValue by remember {
+        mutableStateOf(TextFieldValue(settings.message.withImagePlaceholders(settings.messageImages)))
+    }
     var selectedTextColor by remember { mutableStateOf(Color(0xFFFF3B30)) }
-    LaunchedEffect(settings.message) {
-        if (settings.message != editorValue.text) {
+    LaunchedEffect(settings.message, settings.messageImages) {
+        val nextEditorText = settings.message.withImagePlaceholders(settings.messageImages)
+        if (nextEditorText != editorValue.text) {
             editorValue = TextFieldValue(
-                text = settings.message,
-                selection = TextRange(settings.message.length),
+                text = nextEditorText,
+                selection = TextRange(nextEditorText.length),
             )
         }
     }
@@ -87,18 +90,27 @@ fun MessageSection(
             ) {
                 Text(stringResource(R.string.message), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.weight(1f))
-                TextButton(onClick = { onPickImage(editorValue.selection.start.coerceIn(0, editorValue.text.length)) }) {
+                TextButton(onClick = { onPickImage(editorValue.selection.start.toMessageOffset(editorValue.text)) }) {
                     Text(stringResource(R.string.insert_image))
                 }
                 MessageTemplatesControls(
                     library = library,
                     message = settings.message,
-                    onSelectMessage = { selected ->
+                    textColorSpans = settings.textColorSpans,
+                    messageFontFamily = settings.messageFontFamily,
+                    messageFontStyle = settings.messageFontStyle,
+                    onSelectMessage = { saved ->
                         onUpdate {
+                            val selectedMessage = saved.message.withUppercaseMode(it.uppercaseEnabled)
                             it.copy(
-                                message = selected.withUppercaseMode(it.uppercaseEnabled),
+                                message = selectedMessage,
                                 messageImages = emptyList(),
-                                textColorSpans = emptyList(),
+                                textColorSpans = saved.textColorSpans.adjustTextColorSpans(
+                                    oldText = saved.message,
+                                    newText = selectedMessage,
+                                ),
+                                messageFontFamily = saved.messageFontFamily,
+                                messageFontStyle = saved.messageFontStyle,
                             )
                         }
                     },
@@ -120,48 +132,30 @@ fun MessageSection(
         val editorDirection = settings.slideDirection.layoutDirectionOrNull() ?: LocalLayoutDirection.current
         CompositionLocalProvider(LocalLayoutDirection provides editorDirection) {
             val styledEditorValue = TextFieldValue(
-                annotatedString = editorValue.text.annotatedWithTextColors(settings.textColorSpans),
+                annotatedString = editorValue.text.annotatedEditorTextWithTextColors(settings.textColorSpans),
                 selection = editorValue.selection,
                 composition = editorValue.composition,
             )
-            val placeholderBackground = MaterialTheme.colorScheme.surfaceVariant
-            val placeholderForeground = MaterialTheme.colorScheme.onSurfaceVariant
-            val imagePlaceholderTransformation = remember(
-                settings.messageImages,
-                placeholderBackground,
-                placeholderForeground,
-            ) {
-                MessageImageVisualTransformation(
-                    images = settings.messageImages,
-                    placeholderBackground = placeholderBackground,
-                    placeholderForeground = placeholderForeground,
-                )
-            }
 
             BasicTextField(
                 value = styledEditorValue,
-                visualTransformation = imagePlaceholderTransformation,
                 onValueChange = { value ->
-                    val nextText = value.text.withUppercaseMode(settings.uppercaseEnabled)
-                    editorValue = if (nextText == value.text) {
-                        TextFieldValue(
-                            text = value.text,
-                            selection = value.selection,
-                            composition = value.composition,
-                        )
-                    } else {
-                        TextFieldValue(text = nextText, selection = TextRange(nextText.length))
-                    }
+                    val update = value.text.toMessageEditorUpdate(
+                        previousImages = settings.messageImages,
+                        uppercaseEnabled = settings.uppercaseEnabled,
+                    )
+                    editorValue = TextFieldValue(
+                        text = update.editorText,
+                        selection = value.selection.coerceIn(update.editorText.length),
+                        composition = value.composition?.coerceIn(update.editorText.length),
+                    )
                     onUpdate {
                         it.copy(
-                            message = nextText,
-                            messageImages = it.messageImages.adjustAnchors(
-                                oldText = settings.message,
-                                newText = nextText,
-                            ),
+                            message = update.message,
+                            messageImages = update.images,
                             textColorSpans = it.textColorSpans.adjustTextColorSpans(
                                 oldText = settings.message,
-                                newText = nextText,
+                                newText = update.message,
                             ),
                         )
                     }
@@ -174,6 +168,8 @@ fun MessageSection(
                     fontWeight = settings.messageFontStyle.composeEditorFontWeight(),
                 ),
                 cursorBrush = SolidColor(editorForeground),
+                singleLine = false,
+                maxLines = Int.MAX_VALUE,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 88.dp)
@@ -183,9 +179,9 @@ fun MessageSection(
         }
 
         val selectionStart = minOf(editorValue.selection.start, editorValue.selection.end)
-            .coerceIn(0, editorValue.text.length)
+            .toMessageOffset(editorValue.text)
         val selectionEnd = maxOf(editorValue.selection.start, editorValue.selection.end)
-            .coerceIn(0, editorValue.text.length)
+            .toMessageOffset(editorValue.text)
         val hasSelection = selectionStart < selectionEnd
 
         Row(
@@ -355,17 +351,98 @@ private fun MessageImageRow(
 private fun String.withUppercaseMode(enabled: Boolean): String =
     if (enabled) uppercase() else this
 
-private fun String.annotatedWithTextColors(spans: List<MessageTextColorSpan>): AnnotatedString =
-    buildAnnotatedString {
-        append(this@annotatedWithTextColors)
-        spans.forEach { span ->
-            val start = span.start.coerceIn(0, length)
-            val end = span.end.coerceIn(0, length)
-            if (start < end) {
-                addStyle(SpanStyle(color = span.color), start, end)
+private fun TextRange.coerceIn(textLength: Int): TextRange =
+    TextRange(
+        start = start.coerceIn(0, textLength),
+        end = end.coerceIn(0, textLength),
+    )
+
+private data class MessageEditorUpdate(
+    val editorText: String,
+    val message: String,
+    val images: List<MessageImage>,
+)
+
+private fun String.withImagePlaceholders(images: List<MessageImage>): String {
+    if (images.isEmpty()) return this
+    val imagesByIndex = images
+        .groupBy { it.insertionIndex.coerceIn(0, length) }
+        .toSortedMap()
+    return buildString {
+        for (index in 0..this@withImagePlaceholders.length) {
+            repeat(imagesByIndex[index].orEmpty().size) {
+                append(ImagePlaceholder)
+            }
+            if (index < this@withImagePlaceholders.length) {
+                append(this@withImagePlaceholders[index])
             }
         }
     }
+}
+
+private fun String.toMessageEditorUpdate(
+    previousImages: List<MessageImage>,
+    uppercaseEnabled: Boolean,
+): MessageEditorUpdate {
+    val previousImagesByOrder = previousImages.sortedWith(
+        compareBy<MessageImage> { it.insertionIndex }.thenBy { it.id }
+    )
+    var imageIndex = 0
+    val nextImages = mutableListOf<MessageImage>()
+    val message = buildString {
+        this@toMessageEditorUpdate.forEach { char ->
+            if (char == ImagePlaceholder) {
+                previousImagesByOrder.getOrNull(imageIndex)?.let { image ->
+                    nextImages += image.copy(insertionIndex = length)
+                }
+                imageIndex += 1
+            } else {
+                append(char)
+            }
+        }
+    }.withUppercaseMode(uppercaseEnabled)
+
+    return MessageEditorUpdate(
+        editorText = message.withImagePlaceholders(nextImages),
+        message = message,
+        images = nextImages,
+    )
+}
+
+private fun Int.toMessageOffset(editorText: String): Int {
+    val safeOffset = coerceIn(0, editorText.length)
+    var messageOffset = 0
+    for (index in 0 until safeOffset) {
+        if (editorText[index] != ImagePlaceholder) {
+            messageOffset += 1
+        }
+    }
+    return messageOffset
+}
+
+private fun String.annotatedEditorTextWithTextColors(spans: List<MessageTextColorSpan>): AnnotatedString =
+    buildAnnotatedString {
+        var messageIndex = 0
+        this@annotatedEditorTextWithTextColors.forEach { char ->
+            val span = if (char == ImagePlaceholder) {
+                null
+            } else {
+                spans.lastOrNull { messageIndex in it.start until it.end }
+            }
+            if (span != null) {
+                pushStyle(SpanStyle(color = span.color))
+                append(char)
+                pop()
+            } else {
+                append(char)
+            }
+            if (char != ImagePlaceholder) {
+                messageIndex += 1
+            }
+        }
+    }
+
+private const val ImagePlaceholder = '\u25A1'
 
 private fun List<MessageImage>.adjustAnchors(
     oldText: String,
@@ -552,9 +629,9 @@ fun RhythmSection(
         LabeledSlider(
             title = stringResource(R.string.start_delay),
             value = settings.startDelaySeconds.toFloat(),
-            valueRange = 1f..10f,
+            valueRange = 0f..10f,
             valueText = stringResource(R.string.value_start_delay, settings.startDelaySeconds),
-            onValueChange = { v -> onUpdate { it.copy(startDelaySeconds = v.roundToInt().coerceIn(1, 10)) } },
+            onValueChange = { v -> onUpdate { it.copy(startDelaySeconds = v.roundToInt().coerceIn(0, 10)) } },
         )
 
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -600,6 +677,18 @@ fun RhythmSection(
                 valueRange = 0.0f..1.5f,
                 valueText = stringResource(R.string.value_seconds, settings.characterGap.toFloat()),
                 onValueChange = { v -> onUpdate { it.copy(characterGap = v.toDouble()) } },
+            )
+            LabeledSlider(
+                title = stringResource(R.string.character_size),
+                value = settings.characterSizeScale.toFloat(),
+                valueRange = 0.25f..1.0f,
+                valueText = stringResource(
+                    R.string.value_percent,
+                    (settings.characterSizeScale * 100).roundToInt(),
+                ),
+                onValueChange = { v ->
+                    onUpdate { it.copy(characterSizeScale = v.toDouble().coerceIn(0.25, 1.0)) }
+                },
             )
         }
     }

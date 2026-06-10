@@ -7,6 +7,7 @@ import fi.attenka.VisualMessage.model.MessageImage
 import fi.attenka.VisualMessage.model.MessageFontFamily
 import fi.attenka.VisualMessage.model.MessageFontStyle
 import fi.attenka.VisualMessage.model.MessageTextColorSpan
+import fi.attenka.VisualMessage.model.SavedMessage
 import fi.attenka.VisualMessage.model.MorseAlphabet
 import fi.attenka.VisualMessage.model.MorseOutputMode
 import fi.attenka.VisualMessage.model.SlideDirection
@@ -39,13 +40,19 @@ class SettingsRepository(context: Context) {
         val raw = prefs.getString(KEY_LIBRARY, null) ?: return MessageLibrary.starter
         return runCatching {
             val array = JSONArray(raw)
-            MessageLibrary((0 until array.length()).map { array.getString(it) })
+            MessageLibrary(
+                buildList {
+                    for (index in 0 until array.length()) {
+                        decodeSavedMessage(array, index)?.let(::add)
+                    }
+                }
+            )
         }.getOrDefault(MessageLibrary.starter)
     }
 
     fun saveLibrary(library: MessageLibrary) {
         val array = JSONArray()
-        library.messages.forEach { array.put(it) }
+        library.messages.forEach { array.put(encodeSavedMessage(it)) }
         prefs.edit().putString(KEY_LIBRARY, array.toString()).apply()
     }
 
@@ -75,6 +82,7 @@ class SettingsRepository(context: Context) {
         put("morseOutputMode", s.morseOutputMode.name)
         put("signalFrequency", s.signalFrequency)
         put("startDelaySeconds", s.startDelaySeconds)
+        put("characterSizeScale", s.characterSizeScale)
         put("morseUnitDuration", s.morseUnitDuration)
         put("morseAlphabet", s.morseAlphabet.name)
         put("customForeground", encodeColor(s.customForeground))
@@ -117,7 +125,8 @@ class SettingsRepository(context: Context) {
             morseSoundEnabled = json.optBoolean("morseSoundEnabled", defaults.morseSoundEnabled),
             morseOutputMode = outputMode,
             signalFrequency = json.optDouble("signalFrequency", defaults.signalFrequency),
-            startDelaySeconds = json.optInt("startDelaySeconds", defaults.startDelaySeconds).coerceIn(1, 10),
+            startDelaySeconds = json.optInt("startDelaySeconds", defaults.startDelaySeconds).coerceIn(0, 10),
+            characterSizeScale = json.optDouble("characterSizeScale", defaults.characterSizeScale).coerceIn(0.25, 1.0),
             morseUnitDuration = json.optDouble("morseUnitDuration", defaults.morseUnitDuration),
             morseAlphabet = json.optEnum("morseAlphabet", defaults.morseAlphabet),
             customForeground = json.optColor("customForeground", defaults.customForeground),
@@ -146,6 +155,31 @@ class SettingsRepository(context: Context) {
             green = obj.optDouble("green", 1.0).toFloat(),
             blue = obj.optDouble("blue", 1.0).toFloat(),
             alpha = obj.optDouble("opacity", 1.0).toFloat(),
+        )
+    }
+
+    private fun encodeSavedMessage(saved: SavedMessage): JSONObject =
+        JSONObject().apply {
+            put("message", saved.message)
+            put("textColorSpans", encodeTextColorSpans(saved.textColorSpans))
+            put("messageFontFamily", saved.messageFontFamily.name)
+            put("messageFontStyle", saved.messageFontStyle.name)
+        }
+
+    private fun decodeSavedMessage(array: JSONArray, index: Int): SavedMessage? {
+        val defaults = SavedMessage("")
+        val item = array.opt(index) ?: return null
+        if (item is String) {
+            return item.trim().takeIf { it.isNotEmpty() }?.let(::SavedMessage)
+        }
+
+        val json = item as? JSONObject ?: return null
+        val message = json.optString("message", "").trim().takeIf { it.isNotEmpty() } ?: return null
+        return SavedMessage(
+            message = message,
+            textColorSpans = json.optTextColorSpans(emptyList(), message.length),
+            messageFontFamily = json.optEnum("messageFontFamily", defaults.messageFontFamily),
+            messageFontStyle = json.optEnum("messageFontStyle", defaults.messageFontStyle),
         )
     }
 

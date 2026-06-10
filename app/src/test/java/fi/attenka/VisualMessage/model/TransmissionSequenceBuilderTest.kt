@@ -47,7 +47,7 @@ class TransmissionSequenceBuilderTest {
     }
 
     @Test
-    fun visualModeShowsWhitespaceAsVisibleFrame() {
+    fun visualModeUsesBlankFrameForWhitespace() {
         val settings = TransmissionSettings(
             message = "A B",
             visualSignalEnabled = false,

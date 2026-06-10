@@ -9,11 +9,17 @@
     <string name="stop">Stop</string>
     <string name="help">Help</string>
     <string name="help_title">Help</string>
-    <string name="help_summary">Write a message, choose Visual or Morse, then send. Visual shows the message on screen; Morse sends code with screen flashes, the flashlight, optional beeps, or any combination you choose.</string>
+    <string name="help_summary">Write a message, choose Visual or Morse, then send. Visual shows the message on screen; Morse sends code with screen flashes, the flashlight, optional beeps, or any combination you choose. Tap Receive to decode Morse from another device.</string>
+    <string name="help_message_title">Message</string>
+    <string name="help_message_body">Use Image to insert a picture at the cursor. Select text and Apply color to highlight part of the message. Choose font and style, or turn on Uppercase. Saved messages stores and recalls your favorite texts.</string>
     <string name="help_visual_title">Visual mode</string>
-    <string name="help_visual_body">Use transitions for screen text. Slide direction controls LTR/RTL movement; Slide vertical stacks letters by word.</string>
+    <string name="help_visual_body">Pick a transition: Instant, Fade, Slide, Slide vertical, or Scale. Slide direction sets Auto, LTR, or RTL scrolling; Slide vertical stacks letters by word. With images in the message, Image slide behavior controls whether images stay visible between letters or move with the slide. Colors sets the on-screen palette; Multicolor letters cycles a color per character. Editor colors only affects the writing area.</string>
+    <string name="help_rhythm_title">Rhythm and attention</string>
+    <string name="help_rhythm_body">Start delay, repeats, and repeat-until-stopped control how long and how often the message plays. In Visual mode, adjust character duration, emoji duration, and character gap. Attention signal can add a start tone and/or a screen flash before transmission.</string>
     <string name="help_morse_title">Morse mode</string>
-    <string name="help_morse_body">Use Morse output to choose Screen, Torch, or Both. Morse beep plays the selected frequency during each mark. The current character is shown in the lower-right corner while it is being sent. The receiver works best when the flashing light is centered in the aim box; distant small lights are now detected more reliably. International is the standard alphabet; Continental adds the extra letters shown below.</string>
+    <string name="help_morse_body">Choose alphabet and speed (WPM). Morse output picks Screen, Torch, or Both. Optional Morse beep plays the selected frequency on each mark. The character being sent appears in the lower-right corner. International is the standard alphabet; Continental adds the extra letters shown below.</string>
+    <string name="help_receiver_title">Morse receiver</string>
+    <string name="help_receiver_body">Tap Receive to open the camera receiver. Point at the flashing light and keep it centered in the aim box. High frame rate improves detection of fast or distant signals.</string>
     <string name="help_continental_note">Same as International, plus:</string>
 
     <string name="message">Message</string>
@@ -57,6 +63,7 @@
     <string name="character_duration">Character duration</string>
     <string name="emoji_duration">Emoji duration</string>
     <string name="character_gap">Character gap</string>
+    <string name="character_size">Character size</string>
 
     <string name="attention_signal">Attention signal</string>
     <string name="sound">Sound</string>
@@ -113,4 +120,5 @@
     <string name="value_hz" translatable="false">%1$d Hz</string>
     <string name="value_seconds" translatable="false">%1$.2f s</string>
     <string name="value_start_delay" translatable="false">%1$d s</string>
+    <string name="value_percent" translatable="false">%1$d %%</string>
 </resources>

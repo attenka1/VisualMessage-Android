@@ -14,13 +14,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import fi.attenka.VisualMessage.R
 import fi.attenka.VisualMessage.model.MessageLibrary
+import fi.attenka.VisualMessage.model.MessageFontFamily
+import fi.attenka.VisualMessage.model.MessageFontStyle
+import fi.attenka.VisualMessage.model.MessageTextColorSpan
+import fi.attenka.VisualMessage.model.SavedMessage
 
 /** Saved-messages menu and save/remove toggle, mirroring the iOS MessageTemplatesControls. */
 @Composable
 fun MessageTemplatesControls(
     library: MessageLibrary,
     message: String,
-    onSelectMessage: (String) -> Unit,
+    textColorSpans: List<MessageTextColorSpan>,
+    messageFontFamily: MessageFontFamily,
+    messageFontStyle: MessageFontStyle,
+    onSelectMessage: (SavedMessage) -> Unit,
     onLibraryChange: (MessageLibrary) -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -45,7 +52,7 @@ fun MessageTemplatesControls(
             } else {
                 library.messages.forEach { saved ->
                     DropdownMenuItem(
-                        text = { Text(saved) },
+                        text = { Text(saved.message) },
                         onClick = {
                             onSelectMessage(saved)
                             menuExpanded = false
@@ -58,7 +65,16 @@ fun MessageTemplatesControls(
         IconButton(
             onClick = {
                 onLibraryChange(
-                    if (isCurrentSaved) library.removing(message) else library.adding(message)
+                    if (isCurrentSaved) {
+                        library.removing(message)
+                    } else {
+                        library.adding(
+                            message = message,
+                            textColorSpans = textColorSpans,
+                            messageFontFamily = messageFontFamily,
+                            messageFontStyle = messageFontStyle,
+                        )
+                    }
                 )
             },
             enabled = !trimmedEmpty,

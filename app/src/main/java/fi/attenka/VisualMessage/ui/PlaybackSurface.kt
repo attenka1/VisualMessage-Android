@@ -144,11 +144,10 @@ private fun FrameContent(frame: TransmissionFrame, settings: TransmissionSetting
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            val side = minOf(maxWidth.value, maxHeight.value)
             Text(
                 text = kind.value,
                 color = colorForText(kind.value, settings, kind.color),
-                fontSize = (side * 0.78f).sp,
+                fontSize = settings.playbackSingleCharacterFontSizeSp(maxWidth.value, maxHeight.value).sp,
                 fontFamily = settings.messageFontFamily.composeFontFamily(),
                 fontStyle = settings.messageFontStyle.composeFontStyle(),
                 fontWeight = settings.messageFontStyle.composeFontWeight(),
@@ -157,26 +156,11 @@ private fun FrameContent(frame: TransmissionFrame, settings: TransmissionSetting
             )
         }
 
-        is FrameKind.Whitespace -> BoxWithConstraints(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            val side = minOf(maxWidth.value, maxHeight.value)
-            Text(
-                text = visibleWhitespace(kind.value),
-                color = (kind.color ?: settings.activeTheme.foreground).copy(alpha = 0.72f),
-                fontSize = (side * 0.46f).sp,
-                fontFamily = settings.messageFontFamily.composeFontFamily(),
-                fontStyle = settings.messageFontStyle.composeFontStyle(),
-                fontWeight = settings.messageFontStyle.composeFontWeight(),
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-            )
-        }
+        is FrameKind.Whitespace -> Box(Modifier.fillMaxSize())
 
         is FrameKind.SlideMessage -> SlideMessageContent(kind, frame.durationSeconds, settings)
 
-        is FrameKind.Image -> ImageFrameContent(kind.uri)
+        is FrameKind.Image -> ImageFrameContent(kind.uri, settings)
 
         FrameKind.AppLogo -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Image(
@@ -204,7 +188,7 @@ private fun FrameContent(frame: TransmissionFrame, settings: TransmissionSetting
 }
 
 @Composable
-private fun ImageFrameContent(uri: String) {
+private fun ImageFrameContent(uri: String, settings: TransmissionSettings) {
     val context = LocalContext.current
     val bitmap = remember(uri) { loadMessageImageBitmap(context, uri) }
 
@@ -215,7 +199,7 @@ private fun ImageFrameContent(uri: String) {
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .fillMaxSize(0.88f)
+                    .fillMaxSize(settings.playbackImageFillFraction())
                     .padding(24.dp),
             )
         }
@@ -234,7 +218,8 @@ private fun SlideMessageContent(
     ) {
         val side = minOf(maxWidth.value, maxHeight.value)
         val isVerticalSlide = settings.transitionStyle == TransitionStyle.SLIDE_VERTICAL
-        val fontSize = side * if (isVerticalSlide) 0.46f else 0.62f
+        val baseFraction = if (isVerticalSlide) 0.46f else 0.62f
+        val fontSize = settings.playbackSlideFontSizeSp(side, baseFraction)
         val textStyle = MaterialTheme.typography.displayLarge.copy(
             color = settings.activeTheme.foreground,
             fontSize = fontSize.sp,
@@ -296,8 +281,9 @@ private fun SlideMessageContent(
                 is SlideItem.Image -> it.uri
             }
         }
-        val animatedOffset = remember(animationKey, startOffset, layoutDirection) { Animatable(startOffset) }
-        LaunchedEffect(animationKey, startOffset, targetOffset, durationSeconds, layoutDirection, isVerticalSlide) {
+        val playbackKey = "$animationKey#${kind.index}"
+        val animatedOffset = remember(playbackKey, startOffset, layoutDirection) { Animatable(startOffset) }
+        LaunchedEffect(playbackKey, startOffset, targetOffset, durationSeconds, layoutDirection, isVerticalSlide) {
             val animationSpec = tween<Float>(
                 durationMillis = (durationSeconds * 1000).toInt().coerceAtLeast(220),
                 easing = LinearEasing,
@@ -449,9 +435,6 @@ private fun morseLetter(frame: TransmissionFrame): String? =
         is FrameKind.MorseLetterGap -> kind.letter
         else -> null
     }
-
-private fun visibleWhitespace(value: String): String =
-    if (value.any { it == '\n' || it == '\r' }) "↵" else "␣"
 
 private val multicolorPalette = listOf(
     Color(0xFFFF3B30),

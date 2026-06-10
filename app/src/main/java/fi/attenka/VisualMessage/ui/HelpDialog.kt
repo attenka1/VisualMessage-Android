@@ -41,12 +41,24 @@ fun HelpDialog(onDismiss: () -> Unit) {
                 )
                 Text(stringResource(R.string.help_summary))
                 HelpSection(
+                    title = stringResource(R.string.help_message_title),
+                    body = stringResource(R.string.help_message_body),
+                )
+                HelpSection(
                     title = stringResource(R.string.help_visual_title),
                     body = stringResource(R.string.help_visual_body),
                 )
                 HelpSection(
+                    title = stringResource(R.string.help_rhythm_title),
+                    body = stringResource(R.string.help_rhythm_body),
+                )
+                HelpSection(
                     title = stringResource(R.string.help_morse_title),
                     body = stringResource(R.string.help_morse_body),
+                )
+                HelpSection(
+                    title = stringResource(R.string.help_receiver_title),
+                    body = stringResource(R.string.help_receiver_body),
                 )
                 MorseCodeSection(
                     title = stringResource(R.string.international),

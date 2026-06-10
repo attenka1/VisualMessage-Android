@@ -30,3 +30,13 @@ Updated AndroidX dependencies for better Android 16 KB page size compatibility.
 Improved Morse code reception from distant light sources. The receiver now detects small bright flashes more reliably when the signal appears as a small point in the camera view.
 
 Also includes receiver stability improvements and general maintenance fixes.
+
+1.0.7
+
+1.0.8.
+
+• Saved messages now keep font, style, and text colors
+• New color picker
+• Expanded Help guide
+• More reliable slide playback when repeating
+• Minor improvements and fixes

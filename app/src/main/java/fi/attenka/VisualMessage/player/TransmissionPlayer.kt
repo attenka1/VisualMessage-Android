@@ -54,10 +54,12 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
                 flashlightController.turnOff()
 
                 // Give the user time to turn the phone before anything is shown or heard.
-                for (seconds in settings.startDelaySeconds downTo 1) {
-                    if (!isActive) return@launch
-                    progressText = seconds.toString()
-                    delay(1000)
+                if (settings.startDelaySeconds > 0) {
+                    for (seconds in settings.startDelaySeconds downTo 1) {
+                        if (!isActive) return@launch
+                        progressText = seconds.toString()
+                        delay(1000)
+                    }
                 }
 
                 progressText = getApplication<Application>().getString(R.string.sending)
@@ -121,7 +123,7 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
     ) {
         frames.forEachIndexed { index, frame ->
             if (!currentCoroutineContext().isActive) return
-            currentFrame = frame
+            currentFrame = frame.withPlaybackLoopIndex(loopIndex)
             val isMorseSignal = frame.kind is FrameKind.MorseSignal
             flashlightController.setEnabled(frame.shouldUseTorch(settings))
             tonePlayer.setContinuousToneEnabled(
@@ -143,4 +145,9 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
         settings.mode == TransmissionMode.MORSE &&
             settings.morseOutputMode.usesTorch &&
             kind is FrameKind.MorseSignal
+
+    private fun TransmissionFrame.withPlaybackLoopIndex(loopIndex: Int?): TransmissionFrame {
+        val slideMessage = kind as? FrameKind.SlideMessage ?: return this
+        return copy(kind = slideMessage.copy(index = loopIndex ?: slideMessage.index))
+    }
 }
