@@ -7,6 +7,11 @@ import java.text.BreakIterator
  * Mirrors the iOS TransmissionSequenceBuilder exactly so timing is identical across platforms.
  */
 object TransmissionSequenceBuilder {
+    private const val MORSE_DOT_UNITS = 1.0
+    private const val MORSE_DASH_UNITS = 3.0
+    private const val MORSE_INTRA_CHARACTER_GAP_UNITS = 1.0
+    private const val MORSE_CHARACTER_GAP_UNITS = 4.0
+    private const val MORSE_WORD_GAP_UNITS = 8.0
 
     fun frames(settings: TransmissionSettings): List<TransmissionFrame> {
         val visualMessage = settings.message
@@ -33,14 +38,9 @@ object TransmissionSequenceBuilder {
                 TransmissionMode.MORSE -> frames += morseFrames(morseMessage, settings)
             }
 
-            if (repeatIndex < repeats - 1) {
+            if (settings.mode == TransmissionMode.VISUAL && repeatIndex < repeats - 1) {
                 frames += TransmissionFrame(FrameKind.Blank, settings.characterDuration * 5)
             }
-        }
-
-        if (settings.mode == TransmissionMode.MORSE) {
-            // Hold the screen black briefly after the last morse mark.
-            frames += TransmissionFrame(FrameKind.Blank, settings.morseUnitDuration * 8)
         }
 
         return frames
@@ -233,21 +233,31 @@ object TransmissionSequenceBuilder {
                 val displayedLetter = letter.lowercaseChar().toString()
 
                 signals.forEachIndexed { signalIndex, signal ->
-                    frames += TransmissionFrame(FrameKind.MorseSignal(displayedLetter), unit * (if (signal == '-') 3.0 else 1.0))
+                    frames += TransmissionFrame(
+                        FrameKind.MorseSignal(displayedLetter),
+                        unit * if (signal == '-') MORSE_DASH_UNITS else MORSE_DOT_UNITS,
+                    )
 
                     if (signalIndex < signals.size - 1) {
-                        frames += TransmissionFrame(FrameKind.MorseLetterGap(displayedLetter), unit)
+                        frames += TransmissionFrame(
+                            FrameKind.MorseLetterGap(displayedLetter),
+                            unit * MORSE_INTRA_CHARACTER_GAP_UNITS,
+                        )
                     }
                 }
 
                 if (letterIndex < letters.size - 1) {
-                    frames += TransmissionFrame(FrameKind.Blank, unit * 4)
+                    frames += TransmissionFrame(FrameKind.Blank, unit * MORSE_CHARACTER_GAP_UNITS)
                 }
             }
 
             if (wordIndex < words.size - 1) {
-                frames += TransmissionFrame(FrameKind.Blank, unit * 8)
+                frames += TransmissionFrame(FrameKind.Blank, unit * MORSE_WORD_GAP_UNITS)
             }
+        }
+
+        if (frames.isNotEmpty()) {
+            frames += TransmissionFrame(FrameKind.Blank, unit * MORSE_WORD_GAP_UNITS)
         }
 
         return frames

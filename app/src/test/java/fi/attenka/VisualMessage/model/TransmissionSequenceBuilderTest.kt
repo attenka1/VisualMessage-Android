@@ -148,6 +148,7 @@ class TransmissionSequenceBuilderTest {
             message = "A",
             mode = TransmissionMode.MORSE,
             morseUnitDuration = 0.2,
+            repeatCount = 1,
         )
 
         val frames = TransmissionSequenceBuilder.frames(settings)
@@ -164,6 +165,26 @@ class TransmissionSequenceBuilderTest {
         assertEquals(0.2, frames[0].durationSeconds, 0.000_001)
         assertEquals(0.2, frames[1].durationSeconds, 0.000_001)
         assertEquals(0.6, frames[2].durationSeconds, 0.000_001)
+        assertEquals(1.6, frames[3].durationSeconds, 0.000_001)
+    }
+
+    @Test
+    fun morseUsesFourUnitLetterGapAndEightUnitWordGaps() {
+        val settings = TransmissionSettings(
+            message = "ET E",
+            mode = TransmissionMode.MORSE,
+            morseUnitDuration = 0.2,
+            repeatCount = 1,
+        )
+
+        val frames = TransmissionSequenceBuilder.frames(settings)
+
+        assertEquals(FrameKind.Blank, frames[1].kind)
+        assertEquals(0.8, frames[1].durationSeconds, 0.000_001)
+        assertEquals(FrameKind.Blank, frames[3].kind)
+        assertEquals(1.6, frames[3].durationSeconds, 0.000_001)
+        assertEquals(FrameKind.Blank, frames[5].kind)
+        assertEquals(1.6, frames[5].durationSeconds, 0.000_001)
     }
 
     @Test
