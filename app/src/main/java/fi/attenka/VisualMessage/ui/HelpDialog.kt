@@ -35,7 +35,7 @@ fun HelpDialog(onDismiss: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 Text(
-                    "VisualMessage v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    "${stringResource(R.string.app_name)} v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -184,47 +184,52 @@ fun MessageSection(
             .toMessageOffset(editorValue.text)
         val hasSelection = selectionStart < selectionEnd
 
-        Row(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             ColorPickerField(
                 label = stringResource(R.string.selected_text_color),
                 color = selectedTextColor,
                 onColorChange = { selectedTextColor = it },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
             )
-            TextButton(
-                enabled = hasSelection,
-                onClick = {
-                    onUpdate {
-                        it.copy(
-                            textColorSpans = it.textColorSpans.applyTextColor(
-                                start = selectionStart,
-                                end = selectionEnd,
-                                color = selectedTextColor,
-                            ),
-                        )
-                    }
-                },
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Text(stringResource(R.string.apply_text_color))
-            }
-            TextButton(
-                enabled = hasSelection,
-                onClick = {
-                    onUpdate {
-                        it.copy(
-                            textColorSpans = it.textColorSpans.removeTextColor(
-                                start = selectionStart,
-                                end = selectionEnd,
-                            ),
-                        )
-                    }
-                },
-            ) {
-                Text(stringResource(R.string.clear_text_color))
+                TextButton(
+                    enabled = hasSelection,
+                    onClick = {
+                        onUpdate {
+                            it.copy(
+                                textColorSpans = it.textColorSpans.applyTextColor(
+                                    start = selectionStart,
+                                    end = selectionEnd,
+                                    color = selectedTextColor,
+                                ),
+                            )
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.apply_text_color))
+                }
+                TextButton(
+                    enabled = hasSelection,
+                    onClick = {
+                        onUpdate {
+                            it.copy(
+                                textColorSpans = it.textColorSpans.removeTextColor(
+                                    start = selectionStart,
+                                    end = selectionEnd,
+                                ),
+                            )
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.clear_text_color))
+                }
             }
         }
 

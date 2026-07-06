@@ -16,14 +16,11 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -69,7 +65,6 @@ fun PlaybackSurface(
     frame: TransmissionFrame,
     settings: TransmissionSettings,
     progressText: String,
-    onStop: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val layoutDirection = settings.slideDirection.layoutDirectionOr(LocalLayoutDirection.current)
@@ -101,25 +96,16 @@ fun PlaybackSurface(
             }
         }
 
-        Row(
+        Text(
+            text = progressText,
+            color = Color.White,
             modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(18.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = progressText,
-                color = Color.White,
-                modifier = Modifier
-                    .background(Color.Black.copy(alpha = 0.35f), RoundedCornerShape(50))
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
-                style = MaterialTheme.typography.bodySmall,
-            )
-            Button(onClick = onStop) {
-                Text(stringResource(R.string.stop))
-            }
-        }
+                .align(Alignment.TopStart)
+                .padding(18.dp)
+                .background(Color.Black.copy(alpha = 0.35f), RoundedCornerShape(50))
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            style = MaterialTheme.typography.bodySmall,
+        )
 
         morseLetter(frame)?.let { letter ->
             Text(

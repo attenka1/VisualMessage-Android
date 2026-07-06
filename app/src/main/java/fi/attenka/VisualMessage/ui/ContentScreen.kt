@@ -114,7 +114,9 @@ fun ContentScreen(
             Header(
                 settings = settings,
                 progressText = player.progressText,
+                isPlaying = player.isPlaying,
                 onSend = { send() },
+                onStop = player::stop,
                 onOpenHelp = { showHelp = true },
                 onOpenReceiver = onOpenReceiver,
             )
@@ -140,12 +142,14 @@ fun ContentScreen(
             exit = fadeOut(),
         ) {
             KeepScreenOn()
-            PlaybackSurface(
-                frame = player.currentFrame,
-                settings = settings,
-                progressText = player.progressText,
-                onStop = player::stop,
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                PlaybackSurface(
+                    frame = player.currentFrame,
+                    settings = settings,
+                    progressText = player.progressText,
+                )
+                PlaybackStopButton(onStop = player::stop)
+            }
         }
 
         if (showHelp) {
@@ -158,7 +162,9 @@ fun ContentScreen(
 private fun Header(
     settings: TransmissionSettings,
     progressText: String,
+    isPlaying: Boolean,
     onSend: () -> Unit,
+    onStop: () -> Unit,
     onOpenHelp: () -> Unit,
     onOpenReceiver: () -> Unit,
 ) {
@@ -174,7 +180,9 @@ private fun Header(
                 HeaderIdentity(progressText = progressText)
                 HeaderActions(
                     settings = settings,
+                    isPlaying = isPlaying,
                     onSend = onSend,
+                    onStop = onStop,
                     onOpenHelp = onOpenHelp,
                     onOpenReceiver = onOpenReceiver,
                     modifier = Modifier.align(Alignment.End),
@@ -188,7 +196,9 @@ private fun Header(
                 HeaderIdentity(progressText = progressText, modifier = Modifier.weight(1f))
                 HeaderActions(
                     settings = settings,
+                    isPlaying = isPlaying,
                     onSend = onSend,
+                    onStop = onStop,
                     onOpenHelp = onOpenHelp,
                     onOpenReceiver = onOpenReceiver,
                 )
@@ -214,7 +224,7 @@ private fun HeaderIdentity(
             modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp)),
         )
         Column(modifier = Modifier.weight(1f)) {
-            Text("VisualMessage", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleMedium)
             Text(
                 progressText,
                 style = MaterialTheme.typography.bodySmall,
@@ -227,7 +237,9 @@ private fun HeaderIdentity(
 @Composable
 private fun HeaderActions(
     settings: TransmissionSettings,
+    isPlaying: Boolean,
     onSend: () -> Unit,
+    onStop: () -> Unit,
     onOpenHelp: () -> Unit,
     onOpenReceiver: () -> Unit,
     modifier: Modifier = Modifier,
@@ -244,14 +256,38 @@ private fun HeaderActions(
             Text(stringResource(R.string.receive))
         }
         Button(
-            onClick = onSend,
-            enabled = settings.message.trim().isNotEmpty() ||
+            onClick = if (isPlaying) onStop else onSend,
+            enabled = isPlaying ||
+                settings.message.trim().isNotEmpty() ||
                 (settings.mode == TransmissionMode.VISUAL && settings.messageImages.isNotEmpty()),
             modifier = Modifier.height(44.dp),
         ) {
-            Text("\u25B6")
+            Text(if (isPlaying) "\u25A0" else "\u25B6")
             Spacer(Modifier.size(6.dp))
-            Text(stringResource(R.string.send))
+            Text(stringResource(if (isPlaying) R.string.stop else R.string.send))
+        }
+    }
+}
+
+@Composable
+private fun PlaybackStopButton(onStop: () -> Unit) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+    ) {
+        val compact = maxWidth < 430.dp
+        Button(
+            onClick = onStop,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = if (compact) 42.dp else 0.dp)
+                .height(44.dp),
+        ) {
+            Text("\u25A0")
+            Spacer(Modifier.size(6.dp))
+            Text(stringResource(R.string.stop))
         }
     }
 }

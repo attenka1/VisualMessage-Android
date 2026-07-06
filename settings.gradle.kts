@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "VisualMessage"
+rootProject.name = "Visual Message"
 include(":app")
