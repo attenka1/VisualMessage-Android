@@ -11,14 +11,17 @@ class FlashlightController(context: Context) {
         .getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
     private val torchCameraId: String? by lazy { findTorchCameraId() }
+    private var currentState: Boolean? = null
 
     val isAvailable: Boolean
         get() = torchCameraId != null
 
     fun setEnabled(enabled: Boolean) {
+        if (enabled == currentState) return
         val cameraId = torchCameraId ?: return
         runCatching {
             cameraManager.setTorchMode(cameraId, enabled)
+            currentState = enabled
         }.onFailure { error ->
             if (error !is CameraAccessException && error !is SecurityException) throw error
         }

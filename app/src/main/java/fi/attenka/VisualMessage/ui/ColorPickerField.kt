@@ -137,6 +137,12 @@ private fun SaturationValuePlane(
     modifier: Modifier = Modifier,
 ) {
     var size by remember { mutableStateOf(IntSize.Zero) }
+    val saturationBrush = remember(hue) {
+        Brush.horizontalGradient(listOf(Color.White, Color.hsv(hue, 1f, 1f)))
+    }
+    val valueBrush = remember {
+        Brush.verticalGradient(listOf(Color.Transparent, Color.Black))
+    }
     val updateColor = { position: Offset ->
         if (size.width > 0 && size.height > 0) {
             onChange(
@@ -152,9 +158,8 @@ private fun SaturationValuePlane(
             .onSizeChanged { size = it }
             .colorPickerPointerInput(updateColor),
     ) {
-        val hueColor = Color.hsv(hue, 1f, 1f)
-        drawRect(Brush.horizontalGradient(listOf(Color.White, hueColor)))
-        drawRect(Brush.verticalGradient(listOf(Color.Transparent, Color.Black)))
+        drawRect(saturationBrush)
+        drawRect(valueBrush)
 
         val marker = Offset(saturation * size.width, (1f - value) * size.height)
         drawCircle(Color.White, radius = 8.dp.toPx(), center = marker, style = Stroke(2.dp.toPx()))
@@ -168,6 +173,19 @@ private fun HueBar(
     onChange: (Float) -> Unit,
 ) {
     var size by remember { mutableStateOf(IntSize.Zero) }
+    val hueBrush = remember {
+        Brush.verticalGradient(
+            listOf(
+                Color.hsv(0f, 1f, 1f),
+                Color.hsv(60f, 1f, 1f),
+                Color.hsv(120f, 1f, 1f),
+                Color.hsv(180f, 1f, 1f),
+                Color.hsv(240f, 1f, 1f),
+                Color.hsv(300f, 1f, 1f),
+                Color.hsv(360f, 1f, 1f),
+            ),
+        )
+    }
     val updateHue = { position: Offset ->
         if (size.height > 0) {
             onChange(((position.y / size.height).coerceIn(0f, 1f) * 360f).coerceIn(0f, 360f))
@@ -182,17 +200,7 @@ private fun HueBar(
             .colorPickerPointerInput(updateHue),
     ) {
         drawRect(
-            Brush.verticalGradient(
-                listOf(
-                    Color.hsv(0f, 1f, 1f),
-                    Color.hsv(60f, 1f, 1f),
-                    Color.hsv(120f, 1f, 1f),
-                    Color.hsv(180f, 1f, 1f),
-                    Color.hsv(240f, 1f, 1f),
-                    Color.hsv(300f, 1f, 1f),
-                    Color.hsv(360f, 1f, 1f),
-                ),
-            ),
+            hueBrush,
             size = Size(size.width.toFloat(), size.height.toFloat()),
         )
         val y = (hue / 360f).coerceIn(0f, 1f) * size.height

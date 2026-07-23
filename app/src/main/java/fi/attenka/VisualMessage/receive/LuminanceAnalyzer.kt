@@ -13,6 +13,8 @@ class LuminanceAnalyzer(
     private val onSample: (level: Double, timestampMs: Long) -> Unit,
 ) : ImageAnalysis.Analyzer {
 
+    private val histogram = IntArray(LUMINANCE_BUCKETS)
+
     override fun analyze(image: ImageProxy) {
         try {
             val plane = image.planes[0]
@@ -27,7 +29,7 @@ class LuminanceAnalyzer(
             val startX = (width - roiW) / 2
             val startY = (height - roiH) / 2
 
-            val histogram = IntArray(LUMINANCE_BUCKETS)
+            histogram.fill(0)
             var count = 0
             var y = startY
             while (y < startY + roiH) {

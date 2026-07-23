@@ -15,9 +15,13 @@ import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.Executor
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.math.abs
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 
 /**
  * Configures CameraX for morse reception: fixed analysis resolution, optional high fps,
@@ -85,6 +89,22 @@ object MorseCameraConfigurator {
             .setCaptureRequestOption(CaptureRequest.SENSOR_SENSITIVITY, MANUAL_ISO)
             .setCaptureRequestOption(CaptureRequest.SENSOR_EXPOSURE_TIME, MANUAL_EXPOSURE_NS)
             .build()
-        camera2.setCaptureRequestOptions(options).get(3, TimeUnit.SECONDS)
+        withTimeout(CAMERA_CONTROL_TIMEOUT_MS) {
+            suspendCancellableCoroutine { continuation ->
+                val future = camera2.setCaptureRequestOptions(options)
+                continuation.invokeOnCancellation { future.cancel(true) }
+                future.addListener(
+                    {
+                        runCatching { future.get() }
+                            .onSuccess { continuation.resume(Unit) }
+                            .onFailure(continuation::resumeWithException)
+                    },
+                    DIRECT_EXECUTOR,
+                )
+            }
+        }
     }
+
+    private val DIRECT_EXECUTOR = Executor(Runnable::run)
+    private const val CAMERA_CONTROL_TIMEOUT_MS = 3_000L
 }

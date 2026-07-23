@@ -1,6 +1,7 @@
 package fi.attenka.VisualMessage.player
 
 import android.app.Application
+import android.os.SystemClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -121,6 +122,7 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
         settings: TransmissionSettings,
         loopIndex: Int? = null,
     ) {
+        var targetTimeNs = SystemClock.elapsedRealtimeNanos()
         frames.forEachIndexed { index, frame ->
             if (!currentCoroutineContext().isActive) return
             currentFrame = frame.withPlaybackLoopIndex(loopIndex)
@@ -137,7 +139,11 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
             } else {
                 "${index + 1} / ${frames.size}"
             }
-            delay((frame.durationSeconds * 1000).toLong())
+            targetTimeNs += (frame.durationSeconds * NANOS_PER_SECOND).toLong()
+            val remainingNs = targetTimeNs - SystemClock.elapsedRealtimeNanos()
+            if (remainingNs > 0) {
+                delay((remainingNs + NANOS_PER_MILLISECOND - 1) / NANOS_PER_MILLISECOND)
+            }
         }
     }
 
@@ -149,5 +155,10 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
     private fun TransmissionFrame.withPlaybackLoopIndex(loopIndex: Int?): TransmissionFrame {
         val slideMessage = kind as? FrameKind.SlideMessage ?: return this
         return copy(kind = slideMessage.copy(index = loopIndex ?: slideMessage.index))
+    }
+
+    private companion object {
+        const val NANOS_PER_SECOND = 1_000_000_000.0
+        const val NANOS_PER_MILLISECOND = 1_000_000L
     }
 }

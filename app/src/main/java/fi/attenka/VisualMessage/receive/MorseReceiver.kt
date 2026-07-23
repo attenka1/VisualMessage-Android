@@ -38,6 +38,10 @@ class MorseReceiver(private val onResult: (MorseReceiverState) -> Unit) {
     private val text = StringBuilder()
     private var letterFlushed = true
     private var spaceAdded = true
+    private var contentRevision = 0L
+    private var emittedContentRevision = -1L
+    private var emittedLightOn: Boolean? = null
+    private var lastUiEmitMs = Long.MIN_VALUE
 
     fun onSample(level: Double, tsMs: Long) {
         if (!initialized) {
@@ -77,10 +81,11 @@ class MorseReceiver(private val onResult: (MorseReceiverState) -> Unit) {
             if (!spaceAdded && off > dotMs * WORD_GAP_RATIO) {
                 if (text.isNotEmpty() && !text.endsWith(" ")) text.append(' ')
                 spaceAdded = true
+                contentRevision++
             }
         }
 
-        emit(level, range)
+        emit(level, range, tsMs)
     }
 
     fun reset() {
@@ -91,7 +96,8 @@ class MorseReceiver(private val onResult: (MorseReceiverState) -> Unit) {
         lightOn = false
         pendingOn = false
         initialized = false
-        emit(0.0, 0.0)
+        contentRevision++
+        emit(0.0, 0.0, 0L, force = true)
     }
 
     private fun commitTransition(on: Boolean, tsMs: Long) {
@@ -115,6 +121,7 @@ class MorseReceiver(private val onResult: (MorseReceiverState) -> Unit) {
         } else {
             symbol.append('-')
         }
+        contentRevision++
     }
 
     private fun flushLetter() {
@@ -122,9 +129,14 @@ class MorseReceiver(private val onResult: (MorseReceiverState) -> Unit) {
         text.append(reverse[symbol.toString()] ?: UNKNOWN)
         symbol.clear()
         letterFlushed = true
+        contentRevision++
     }
 
-    private fun emit(level: Double, range: Double) {
+    private fun emit(level: Double, range: Double, tsMs: Long, force: Boolean = false) {
+        val contentChanged = contentRevision != emittedContentRevision || lightOn != emittedLightOn
+        val uiIntervalElapsed = lastUiEmitMs == Long.MIN_VALUE || tsMs - lastUiEmitMs >= UI_UPDATE_INTERVAL_MS
+        if (!force && !contentChanged && !uiIntervalElapsed) return
+
         val normalized = if (range > NOISE_FLOOR) {
             ((level - minLevel) / range).coerceIn(0.0, 1.0).toFloat()
         } else {
@@ -138,6 +150,9 @@ class MorseReceiver(private val onResult: (MorseReceiverState) -> Unit) {
                 level = normalized,
             )
         )
+        emittedContentRevision = contentRevision
+        emittedLightOn = lightOn
+        lastUiEmitMs = tsMs
     }
 
     companion object {
@@ -149,5 +164,6 @@ class MorseReceiver(private val onResult: (MorseReceiverState) -> Unit) {
         private const val LETTER_GAP_RATIO = 2.5
         private const val WORD_GAP_RATIO = 6.0
         private const val UNKNOWN = '\u00B7' // middle dot for an unrecognized code
+        private const val UI_UPDATE_INTERVAL_MS = 50L
     }
 }

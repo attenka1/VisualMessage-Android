@@ -14,7 +14,8 @@ import kotlin.math.sin
 class TonePlayer {
 
     private val sampleRate = 44_100
-    private var track: AudioTrack? = null
+    private var signalTrack: AudioTrack? = null
+    private var continuousTrack: AudioTrack? = null
     private var continuousToneEnabled = false
     private var continuousToneFrequency: Double? = null
 
@@ -42,7 +43,7 @@ class TonePlayer {
 
         audioTrack.write(samples, 0, samples.size)
         audioTrack.play()
-        track = audioTrack
+        signalTrack = audioTrack
     }
 
     fun setContinuousToneEnabled(enabled: Boolean, frequency: Double = 880.0) {
@@ -58,23 +59,35 @@ class TonePlayer {
             return
         }
 
-        stop()
+        continuousTrack?.let { track ->
+            runCatching {
+                if (track.playState == AudioTrack.PLAYSTATE_PLAYING) track.pause()
+                track.setPlaybackHeadPosition(0)
+            }
+        }
+        continuousToneEnabled = false
     }
 
     fun stop() {
         continuousToneEnabled = false
         continuousToneFrequency = null
-        track?.run {
-            runCatching {
-                if (state == AudioTrack.STATE_INITIALIZED) stop()
-                release()
-            }
-        }
-        track = null
+        releaseTrack(signalTrack)
+        releaseTrack(continuousTrack)
+        signalTrack = null
+        continuousTrack = null
     }
 
     private fun playContinuousTone(frequency: Double) {
-        stop()
+        releaseTrack(signalTrack)
+        signalTrack = null
+
+        if (continuousTrack != null && continuousToneFrequency == frequency) {
+            continuousTrack?.play()
+            continuousToneEnabled = true
+            return
+        }
+
+        releaseTrack(continuousTrack)
 
         val samples = makeToneSamples(frequency, minimumDurationSeconds = 4.0)
         val audioTrack = AudioTrack.Builder()
@@ -98,9 +111,17 @@ class TonePlayer {
         audioTrack.write(samples, 0, samples.size)
         audioTrack.setLoopPoints(0, samples.size, -1)
         audioTrack.play()
-        track = audioTrack
+        continuousTrack = audioTrack
         continuousToneEnabled = true
         continuousToneFrequency = frequency
+    }
+
+    private fun releaseTrack(audioTrack: AudioTrack?) {
+        audioTrack ?: return
+        runCatching {
+            if (audioTrack.playState != AudioTrack.PLAYSTATE_STOPPED) audioTrack.stop()
+        }
+        runCatching { audioTrack.release() }
     }
 
     private fun makeSignalSamples(frequency: Double): ShortArray {
