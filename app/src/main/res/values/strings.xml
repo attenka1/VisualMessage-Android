@@ -21,6 +21,11 @@
     <string name="help_receiver_title">Morse receiver</string>
     <string name="help_receiver_body">Tap Receive to open the camera receiver. Point at the flashing light and keep it centered in the aim box. High frame rate improves detection of fast or distant signals.</string>
     <string name="help_continental_note">Same as International, plus:</string>
+    <string name="help_share_title">Enjoying Visual Message?</string>
+    <string name="help_share_body">If you like the app, tell a friend about it!</string>
+    <string name="share_app">Share app</string>
+    <string name="share_app_chooser_title">Share Visual Message</string>
+    <string name="share_app_message">Try Visual Message — send messages visually or with Morse code: %1$s</string>
 
     <string name="message">Message</string>
     <string name="insert_image">Image</string>

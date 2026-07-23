@@ -1,5 +1,6 @@
 package fi.attenka.VisualMessage.ui
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
@@ -23,6 +25,10 @@ import fi.attenka.VisualMessage.model.MorseCode
 
 @Composable
 fun HelpDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val shareMessage = stringResource(R.string.share_app_message, APP_WEBSITE_URL)
+    val shareChooserTitle = stringResource(R.string.share_app_chooser_title)
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.help_title)) },
@@ -69,6 +75,21 @@ fun HelpDialog(onDismiss: () -> Unit) {
                     entries = MorseCode.continental.filterKeys { it == 'Ü' || it == 'Ñ' },
                     note = stringResource(R.string.help_continental_note),
                 )
+                HelpSection(
+                    title = stringResource(R.string.help_share_title),
+                    body = stringResource(R.string.help_share_body),
+                )
+                TextButton(
+                    onClick = {
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, shareMessage)
+                        }
+                        context.startActivity(Intent.createChooser(shareIntent, shareChooserTitle))
+                    },
+                ) {
+                    Text(stringResource(R.string.share_app))
+                }
             }
         },
         confirmButton = {
@@ -121,3 +142,5 @@ private fun entrySortGroup(character: Char): Int = when {
     character in '0'..'9' -> 1
     else -> 2
 }
+
+private const val APP_WEBSITE_URL = "https://visualmessage.netlify.app/"

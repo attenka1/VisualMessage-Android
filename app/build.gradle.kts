@@ -31,8 +31,8 @@ android {
         applicationId = "fi.attenka.VisualMessage"
         minSdk = 24
         targetSdk = 36
-        versionCode = 16
-        versionName = "1.0.14"
+        versionCode = 18
+        versionName = "1.0.15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

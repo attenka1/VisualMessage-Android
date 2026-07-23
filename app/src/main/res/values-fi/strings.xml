@@ -23,6 +23,11 @@
     <string name="help_receiver_title">Morse-vastaanotin</string>
     <string name="help_receiver_body">Avaa vastaanotin Vastaanota-painikkeesta. Suuntaa kamera vilkkuvaan valoon ja pidä se tähtäysruudun keskellä. Korkea kuvanopeus parantaa nopeiden ja kaukaisten signaalien havaitsemista.</string>
     <string name="help_continental_note">Sama kuin International, lisäksi:</string>
+    <string name="help_share_title">Pidätkö Visual Messagesta?</string>
+    <string name="help_share_body">Jos sovelluksesta on ollut iloa, kerro siitä myös kaverille!</string>
+    <string name="share_app">Jaa sovellus</string>
+    <string name="share_app_chooser_title">Jaa Visual Message</string>
+    <string name="share_app_message">Kokeile Visual Message -sovellusta – lähetä viestejä visuaalisesti tai morsettamalla: %1$s</string>
     <string name="high_frame_rate">Korkea kuvanopeus</string>
     <string name="international">International</string>
     <string name="manual_exposure_hint">Kiinteä valotus lyhyen alustuksen jälkeen (ei automaattia)</string>

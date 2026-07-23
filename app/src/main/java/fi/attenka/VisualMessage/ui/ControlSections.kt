@@ -90,6 +90,21 @@ fun MessageSection(
             ) {
                 Text(stringResource(R.string.message), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.weight(1f))
+                TextButton(
+                    enabled = editorValue.text.isNotEmpty(),
+                    onClick = {
+                        editorValue = TextFieldValue("")
+                        onUpdate {
+                            it.copy(
+                                message = "",
+                                messageImages = emptyList(),
+                                textColorSpans = emptyList(),
+                            )
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.clear))
+                }
                 TextButton(onClick = { onPickImage(editorValue.selection.start.toMessageOffset(editorValue.text)) }) {
                     Text(stringResource(R.string.insert_image))
                 }
