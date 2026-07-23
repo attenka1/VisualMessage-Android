@@ -65,7 +65,12 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
                         target.outputStream().use { output -> input.copyTo(output) }
                     } != null
                 }.getOrDefault(false)
-                if (copied) id to target else null
+                if (copied) {
+                    id to target
+                } else {
+                    target.delete()
+                    null
+                }
             } ?: return@launch
 
             updateSettings { current ->

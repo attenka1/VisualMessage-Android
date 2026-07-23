@@ -5,10 +5,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
- * Holds the live decoding state for the morse receiver. The analyzer runs on the camera's
- * main executor, so receiver callbacks already arrive on the main thread.
+ * Holds the live decoding state for the morse receiver. Camera samples are processed on a
+ * dedicated executor and completed snapshots are posted back to the main thread for Compose.
  */
 class ReceiveViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -20,13 +23,24 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
     var preferHighFrameRate by mutableStateOf(preferences.preferHighFrameRate)
         private set
 
-    private val receiver = MorseReceiver { state = it }
-
-    val analyzer = LuminanceAnalyzer { level, timestampMs ->
-        receiver.onSample(level, timestampMs)
+    private val receiverLock = Any()
+    private val receiver = MorseReceiver { nextState ->
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            state = nextState
+        }
     }
 
-    fun clear() = receiver.reset()
+    val analyzer = LuminanceAnalyzer { level, timestampMs ->
+        synchronized(receiverLock) {
+            receiver.onSample(level, timestampMs)
+        }
+    }
+
+    fun clear() {
+        synchronized(receiverLock) {
+            receiver.reset()
+        }
+    }
 
     fun updatePreferHighFrameRate(enabled: Boolean) {
         preferHighFrameRate = enabled

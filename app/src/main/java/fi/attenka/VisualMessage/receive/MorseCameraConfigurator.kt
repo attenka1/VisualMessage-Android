@@ -104,8 +104,16 @@ object MorseCameraConfigurator {
                 future.addListener(
                     {
                         runCatching { future.get() }
-                            .onSuccess { continuation.resume(Unit) }
-                            .onFailure(continuation::resumeWithException)
+                            .onSuccess {
+                                if (continuation.isActive) {
+                                    runCatching { continuation.resume(Unit) }
+                                }
+                            }
+                            .onFailure { error ->
+                                if (continuation.isActive) {
+                                    runCatching { continuation.resumeWithException(error) }
+                                }
+                            }
                     },
                     DIRECT_EXECUTOR,
                 )

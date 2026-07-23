@@ -40,6 +40,7 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
     private val tonePlayer = TonePlayer()
     private val flashlightController = FlashlightController(application)
     private var playbackJob: Job? = null
+    private var playbackGeneration = 0L
 
     fun start(settings: TransmissionSettings) {
         stop()
@@ -49,6 +50,7 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
         if (firstFrames.isEmpty()) return
 
         isPlaying = true
+        val generation = ++playbackGeneration
 
         playbackJob = viewModelScope.launch {
             try {
@@ -84,19 +86,20 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
                     playFrames(firstFrames, settings)
                 }
             } finally {
-                flashlightController.turnOff()
-                tonePlayer.setContinuousToneEnabled(false)
+                if (generation == playbackGeneration) {
+                    playbackJob = null
+                    releasePlaybackResources()
+                    finish()
+                }
             }
-            finish()
         }
     }
 
     fun stop() {
+        playbackGeneration++
         playbackJob?.cancel()
         playbackJob = null
-        tonePlayer.setContinuousToneEnabled(false)
-        tonePlayer.stop()
-        flashlightController.turnOff()
+        releasePlaybackResources()
         finish()
     }
 
@@ -107,7 +110,13 @@ class TransmissionPlayer(application: Application) : AndroidViewModel(applicatio
     }
 
     override fun onCleared() {
+        playbackGeneration++
+        playbackJob?.cancel()
+        releasePlaybackResources()
         super.onCleared()
+    }
+
+    private fun releasePlaybackResources() {
         tonePlayer.stop()
         flashlightController.turnOff()
     }

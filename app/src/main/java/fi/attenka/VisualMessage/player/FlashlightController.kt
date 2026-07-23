@@ -23,7 +23,15 @@ class FlashlightController(context: Context) {
             cameraManager.setTorchMode(cameraId, enabled)
             currentState = enabled
         }.onFailure { error ->
-            if (error !is CameraAccessException && error !is SecurityException) throw error
+            currentState = null
+            if (
+                error !is CameraAccessException &&
+                error !is SecurityException &&
+                error !is IllegalStateException &&
+                error !is IllegalArgumentException
+            ) {
+                throw error
+            }
         }
     }
 

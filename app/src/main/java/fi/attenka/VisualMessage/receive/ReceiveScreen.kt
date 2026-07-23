@@ -61,6 +61,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 @ExperimentalCamera2Interop
 @Composable
@@ -108,6 +110,7 @@ private fun CameraLayer(viewModel: ReceiveViewModel) {
     val previewView = remember {
         PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER }
     }
+    val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
     var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
 
     LaunchedEffect(viewModel.preferHighFrameRate) {
@@ -115,11 +118,14 @@ private fun CameraLayer(viewModel: ReceiveViewModel) {
             ProcessCameraProvider.getInstance(context).get()
         }
         cameraProvider = provider
-        bindMorseCamera(this, context, previewView, viewModel, provider)
+        bindMorseCamera(this, context, previewView, viewModel, provider, analysisExecutor)
     }
 
-    DisposableEffect(Unit) {
-        onDispose { cameraProvider?.unbindAll() }
+    DisposableEffect(analysisExecutor) {
+        onDispose {
+            cameraProvider?.unbindAll()
+            analysisExecutor.shutdownNow()
+        }
     }
 
     androidx.compose.ui.viewinterop.AndroidView(
@@ -135,13 +141,14 @@ private suspend fun bindMorseCamera(
     previewView: PreviewView,
     viewModel: ReceiveViewModel,
     provider: ProcessCameraProvider,
+    analysisExecutor: ExecutorService,
 ) {
     val fpsRange = MorseCameraConfigurator.selectFpsRange(context, viewModel.preferHighFrameRate)
     val preview = MorseCameraConfigurator.buildPreview(fpsRange).apply {
         setSurfaceProvider(previewView.surfaceProvider)
     }
     val analysis = MorseCameraConfigurator.buildAnalysis(fpsRange).apply {
-        setAnalyzer(ContextCompat.getMainExecutor(context), viewModel.analyzer)
+        setAnalyzer(analysisExecutor, viewModel.analyzer)
     }
 
     val owner = context.findLifecycleOwner() ?: return

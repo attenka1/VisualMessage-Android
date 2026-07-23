@@ -58,6 +58,7 @@ fun AdBannerHost(modifier: Modifier = Modifier) {
                         loadAd(AdMobConfiguration.createAdRequest())
                     }
                 },
+                onRelease = AdView::destroy,
             )
         }
     }
