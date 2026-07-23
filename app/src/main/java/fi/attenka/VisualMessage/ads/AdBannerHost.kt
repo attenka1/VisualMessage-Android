@@ -13,22 +13,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.doOnPreDraw
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /** Bottom banner ad, mirroring the iOS AdBannerHost. */
 @Composable
 fun AdBannerHost(modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val view = LocalView.current
     val activity = remember(context) { context.findActivity() }
     var canShowAds by remember { mutableStateOf(false) }
 
-    LaunchedEffect(activity) {
+    LaunchedEffect(activity, view) {
         val hostActivity = activity ?: return@LaunchedEffect
+        awaitFirstDraw(view)
         AdMobStartup.prepare(hostActivity) {
-            canShowAds = AdMobStartup.canRequestAds(hostActivity)
+            view.post {
+                canShowAds = AdMobStartup.canRequestAds(hostActivity)
+            }
         }
     }
 
@@ -51,6 +59,16 @@ fun AdBannerHost(modifier: Modifier = Modifier) {
                     }
                 },
             )
+        }
+    }
+}
+
+private suspend fun awaitFirstDraw(view: android.view.View) {
+    suspendCancellableCoroutine { continuation ->
+        view.doOnPreDraw {
+            view.post {
+                if (continuation.isActive) continuation.resume(Unit)
+            }
         }
     }
 }

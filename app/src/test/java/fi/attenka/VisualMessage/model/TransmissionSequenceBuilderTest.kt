@@ -14,6 +14,8 @@ class TransmissionSequenceBuilderTest {
             characterDuration = 1.0,
             emojiDuration = 1.0,
             characterGap = 0.0,
+            repeatCount = 1,
+            transitionStyle = TransitionStyle.INSTANT,
         )
 
         val frames = TransmissionSequenceBuilder.frames(settings)
@@ -38,6 +40,8 @@ class TransmissionSequenceBuilderTest {
             characterDuration = 0.5,
             emojiDuration = 2.0,
             characterGap = 0.0,
+            repeatCount = 1,
+            transitionStyle = TransitionStyle.INSTANT,
         )
 
         val frames = TransmissionSequenceBuilder.frames(settings)
@@ -53,6 +57,8 @@ class TransmissionSequenceBuilderTest {
             visualSignalEnabled = false,
             characterDuration = 0.75,
             characterGap = 0.0,
+            repeatCount = 1,
+            transitionStyle = TransitionStyle.INSTANT,
         )
 
         val frames = TransmissionSequenceBuilder.frames(settings)
@@ -76,6 +82,7 @@ class TransmissionSequenceBuilderTest {
             message = "AB",
             visualSignalEnabled = false,
             characterDuration = 0.5,
+            repeatCount = 1,
             transitionStyle = TransitionStyle.SLIDE,
         )
 
@@ -98,6 +105,8 @@ class TransmissionSequenceBuilderTest {
             textColorSpans = listOf(MessageTextColorSpan(start = 0, end = 1, color = color)),
             visualSignalEnabled = false,
             characterGap = 0.0,
+            repeatCount = 1,
+            transitionStyle = TransitionStyle.INSTANT,
         )
 
         val frames = TransmissionSequenceBuilder.frames(settings)
@@ -119,6 +128,7 @@ class TransmissionSequenceBuilderTest {
             visualSignalEnabled = false,
             characterDuration = 0.5,
             characterGap = 0.0,
+            repeatCount = 1,
             transitionStyle = TransitionStyle.SLIDE_VERTICAL,
         )
 
@@ -203,6 +213,8 @@ class TransmissionSequenceBuilderTest {
             characterDuration = 0.5,
             emojiDuration = 1.25,
             characterGap = 0.0,
+            repeatCount = 1,
+            transitionStyle = TransitionStyle.INSTANT,
         )
 
         val frames = TransmissionSequenceBuilder.frames(settings)
@@ -234,6 +246,7 @@ class TransmissionSequenceBuilderTest {
             visualSignalEnabled = false,
             characterDuration = 0.5,
             emojiDuration = 1.25,
+            repeatCount = 1,
             transitionStyle = TransitionStyle.SLIDE,
         )
 
@@ -283,6 +296,7 @@ class TransmissionSequenceBuilderTest {
             visualSignalEnabled = false,
             characterDuration = 0.5,
             emojiDuration = 1.25,
+            repeatCount = 1,
             transitionStyle = TransitionStyle.SLIDE,
             slideImageBehavior = SlideImageBehavior.SLIDE_WITH_TEXT,
         )
@@ -321,6 +335,7 @@ class TransmissionSequenceBuilderTest {
             messageImages = listOf(MessageImage(id = "image-1", uri = "file:///tmp/image.png", insertionIndex = 5)),
             visualSignalEnabled = false,
             characterDuration = 0.5,
+            repeatCount = 1,
             transitionStyle = TransitionStyle.SLIDE,
             slideImageBehavior = SlideImageBehavior.STATIC_BETWEEN_TEXT,
         )
@@ -352,6 +367,7 @@ class TransmissionSequenceBuilderTest {
             messageImages = listOf(MessageImage(id = "image-1", uri = "file:///tmp/image.png", insertionIndex = 4)),
             visualSignalEnabled = false,
             characterDuration = 0.5,
+            repeatCount = 1,
             transitionStyle = TransitionStyle.SLIDE,
             slideImageBehavior = SlideImageBehavior.SLIDE_WITH_TEXT,
         )

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCamera2Interop::class)
-
 package fi.attenka.VisualMessage.receive
 
 import android.content.Context
@@ -15,6 +13,8 @@ import androidx.camera.camera2.interop.ExperimentalCamera2Interop
 import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import java.util.concurrent.Executor
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -71,9 +71,17 @@ object MorseCameraConfigurator {
 
     @ExperimentalCamera2Interop
     fun buildAnalysis(fpsRange: Range<Int>): ImageAnalysis {
+        val resolutionSelector = ResolutionSelector.Builder()
+            .setResolutionStrategy(
+                ResolutionStrategy(
+                    Size(ANALYSIS_WIDTH, ANALYSIS_HEIGHT),
+                    ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER,
+                )
+            )
+            .build()
         val builder = ImageAnalysis.Builder()
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .setTargetResolution(Size(ANALYSIS_WIDTH, ANALYSIS_HEIGHT))
+            .setResolutionSelector(resolutionSelector)
         Camera2Interop.Extender(builder)
             .setCaptureRequestOption(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fpsRange)
         return builder.build()
