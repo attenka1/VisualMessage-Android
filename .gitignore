@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+.idea/
+.kotlin/
+*.iml
+.DS_Store
+local.properties
+build/
+app/build/
+app/release/*.aab
+VisualMessage_ad.cmproj/
